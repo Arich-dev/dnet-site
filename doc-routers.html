@@ -18,7 +18,7 @@
       <h1>DNet</h1>
       <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
     </div>
-    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+    <div class="ver">версия <b>0.4</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
   </div>
 
   <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
@@ -36,7 +36,7 @@
       <div class="box">
         <h2>Быстрая установка</h2>
         <div class="in">
-<p>Готовые статические бинарники лежат в <code>dist/router/</code> (или в архиве <code>dnet-0.3-router.zip</code> на странице «Скачать»):</p>
+<p>Готовые статические бинарники лежат в <code>dist/router/</code> (или в архиве <code>dnet-0.4-router.zip</code> на странице «Скачать»):</p>
 <table><tr><th>Файл</th><th>Процессоры</th></tr><tr><td><code>dnetd-mipsel</code></td><td>MediaTek/Ralink/Atheros little-endian (MT7620/21/28, TP-Link WR741N и многие другие)</td></tr><tr><td><code>dnetd-mips</code></td><td>Atheros/QCA big-endian (AR71xx, ath79)</td></tr><tr><td><code>dnetd-arm</code></td><td>ARMv5–v7 (IPQ40xx, Marvell, Keenetic на ARM)</td></tr><tr><td><code>dnetd-aarch64</code></td><td>64-бит ARM (MT7622/7981, RPi, Filogic)</td></tr><tr><td><code>dnetd-x86</code>, <code>dnetd-x86_64</code></td><td>x86-роутеры, мини-ПК, виртуалки</td></tr></table>
 <p>Скопируйте папку <code>router/</code> на роутер и запустите скрипт — он сам определит архитектуру и систему:</p>
 <pre data-copy>scp -r router root@192.168.1.1:/tmp/dnet      # бинарники dnetd-* положите в эту же папку
@@ -99,9 +99,9 @@ make CC=mipsel-openwrt-linux-musl-gcc     # тулчейном OpenWrt SDK</pre>
         <h3>Скачать</h3>
         <div class="in">
           <div class="btns" style="flex-direction:column">
-            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>36.8 МБ · без прав админа</small></a>
-            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>25.8 МБ · zip</small></a>
-            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="downloads/DNet-0.4-Setup.exe">Установщик Windows<br><small>36.8 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.4-portable.zip">Переносная версия<br><small>25.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.4-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
             <a class="btn" href="download.html">Все файлы и SHA-256</a>
           </div>
         </div>
@@ -152,7 +152,7 @@ make CC=mipsel-openwrt-linux-musl-gcc     # тулчейном OpenWrt SDK</pre>
   </div>
 
   <div id="foot">
-    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    DNet 0.4 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
     Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
   </div>
 </div>

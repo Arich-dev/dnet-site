@@ -18,7 +18,7 @@
       <h1>DNet</h1>
       <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
     </div>
-    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+    <div class="ver">версия <b>0.4</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
   </div>
 
   <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html" class=on>Установка</a><a href="docs.html">Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
@@ -31,26 +31,26 @@
           <div class="tabs"><button class="on">Windows</button><button>Linux</button><button>macOS</button><button>Роутер (dnetd)</button></div>
           <div>
             <div class="pane on">
-<pre data-copy>1. Скачай DNet-0.3-Setup.exe и запусти (права администратора не нужны)
-   или DNet-0.3-portable.zip: распакуй куда угодно и запусти DNet.exe
+<pre data-copy>1. Скачай DNet-0.4-Setup.exe и запусти (права администратора не нужны)
+   или DNet-0.4-portable.zip: распакуй куда угодно и запусти DNet.exe
 2. Значок DNet появится в трее: клик — мини-окно, двойной клик — окно
 3. Расширение: Chrome — chrome://extensions → режим разработчика →
    «Загрузить распакованное» → папка extension (Firefox: см. ниже)
 4. Открой любую страницу, затем окно DNet → «Файлы»</pre>
-              <p>Установщик ставит программу в <code>%LOCALAPPDATA%\Programs\DNet</code> и включает автозапуск для текущего пользователя. Тихая установка: <code>DNet-0.3-Setup.exe /S</code>. Из исходников (нужен Python 3.8+): <code>run_gui.bat</code> или <code>run.bat</code> (консоль).</p>
+              <p>Установщик ставит программу в <code>%LOCALAPPDATA%\Programs\DNet</code> и включает автозапуск для текущего пользователя. Тихая установка: <code>DNet-0.4-Setup.exe /S</code>. Из исходников (нужен Python 3.8+): <code>run_gui.bat</code> или <code>run.bat</code> (консоль).</p>
             </div>
             <div class="pane">
-<pre data-copy>tar xzf dnet-0.3-linux-x64.tar.gz && cd dnet-0.3-linux-x64
+<pre data-copy>tar xzf dnet-0.4-linux-x64.tar.gz && cd dnet-0.4-linux-x64
 sh install.sh            # в ~/.local/opt/dnet, без root
 dnet --gui               # окно;  dnet --tray — в трей;  dnet — консоль
 dnet --autostart on      # автозапуск (systemd --user)
 
 # без бинарника, любая система с Python 3.8+:
-python3 dnet-0.3.pyz --no-ui</pre>
+python3 dnet-0.4.pyz --no-ui</pre>
               <p>Для платы или сервера на весь компьютер: <code>sudo dnet --autostart on --system</code>. Порты UDP 48555 и TCP 48556 разреши в файрволе.</p>
             </div>
             <div class="pane">
-<pre data-copy>tar xzf dnet-0.3-macos-arm64.tar.gz && cd dnet-0.3-macos-arm64
+<pre data-copy>tar xzf dnet-0.4-macos-arm64.tar.gz && cd dnet-0.4-macos-arm64
 sh install.sh
 ~/Applications/DNet/dnet --gui
 
@@ -75,8 +75,8 @@ pip install ziglang &amp;&amp; python router/build.py</pre>
         <div class="in">
           <table>
             <tr><th>Браузер</th><th>Как поставить</th></tr>
-            <tr><td>Chrome, Edge, Brave, Opera, Яндекс</td><td><code>chrome://extensions</code> → режим разработчика → «Загрузить распакованное» → папка <code>extension</code> (есть в установщике, портативной версии и в <a href="downloads/dnet-chrome-0.3.zip">dnet-chrome.zip</a>)</td></tr>
-            <tr><td>Firefox</td><td><code>about:debugging#/runtime/this-firefox</code> → «Загрузить временное дополнение» → <code>manifest.json</code> из папки <code>extension-firefox</code>. Постоянно — в Developer Edition / Nightly (файл <a href="downloads/dnet-firefox-0.3.xpi">.xpi</a>, <code>xpinstall.signatures.required=false</code>)</td></tr>
+            <tr><td>Chrome, Edge, Brave, Opera, Яндекс</td><td><code>chrome://extensions</code> → режим разработчика → «Загрузить распакованное» → папка <code>extension</code> (есть в установщике, портативной версии и в <a href="downloads/dnet-chrome-0.4.zip">dnet-chrome.zip</a>)</td></tr>
+            <tr><td>Firefox</td><td><code>about:debugging#/runtime/this-firefox</code> → «Загрузить временное дополнение» → <code>manifest.json</code> из папки <code>extension-firefox</code>. Постоянно — в Developer Edition / Nightly (файл <a href="downloads/dnet-firefox-0.4.xpi">.xpi</a>, <code>xpinstall.signatures.required=false</code>)</td></tr>
           </table>
           <div class="note">Обычный Firefox принимает только расширения, подписанные Mozilla; подписи у проекта пока нет. Расширение для Firefox написано, но на самом браузере пока не проверялось — см. <a href="status.html">«Проверено»</a>.</div>
         </div>
@@ -143,9 +143,9 @@ pip install ziglang &amp;&amp; python router/build.py</pre>
         <h3>Скачать</h3>
         <div class="in">
           <div class="btns" style="flex-direction:column">
-            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>36.8 МБ · без прав админа</small></a>
-            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>25.8 МБ · zip</small></a>
-            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="downloads/DNet-0.4-Setup.exe">Установщик Windows<br><small>36.8 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.4-portable.zip">Переносная версия<br><small>25.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.4-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
             <a class="btn" href="download.html">Все файлы и SHA-256</a>
           </div>
         </div>
@@ -196,7 +196,7 @@ pip install ziglang &amp;&amp; python router/build.py</pre>
   </div>
 
   <div id="foot">
-    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    DNet 0.4 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
     Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
   </div>
 </div>

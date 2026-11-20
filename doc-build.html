@@ -18,7 +18,7 @@
       <h1>DNet</h1>
       <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
     </div>
-    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+    <div class="ver">версия <b>0.4</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
   </div>
 
   <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
@@ -34,9 +34,9 @@
       <div class="box">
         <h2>Всё, что собирается</h2>
         <div class="in">
-<table><tr><th>Что</th><th>Команда</th><th>Результат</th></tr><tr><td>Windows: exe, установщик, портативная версия</td><td><code>pip install pyinstaller</code> и <code>python packaging/build_windows.py</code></td><td><code>dist/DNet.exe</code>, <code>dnet-cli.exe</code>, <code>DNet-0.3-Setup.exe</code>, <code>DNet-0.3-portable.zip</code></td></tr><tr><td>Linux / macOS: бинарник</td><td><code>pip install pyinstaller</code> и <code>python3 packaging/build_unix.py</code></td><td><code>dist/dnet-0.3-&lt;ос&gt;-&lt;арх&gt;.tar.gz</code></td></tr><tr><td>Любая система: один файл на Python</td><td><code>python packaging/build_unix.py --pyz-only</code></td><td><code>dist/dnet-0.3.pyz</code></td></tr><tr><td>Роутеры (6 архитектур)</td><td><code>pip install ziglang</code> и <code>python router/build.py</code></td><td><code>dist/router/dnetd-&lt;арх&gt;</code> + <code>SHA256SUMS</code></td></tr><tr><td>Расширение Firefox</td><td><code>python tools/build_extensions.py</code></td><td>папка <code>extension-firefox/</code></td></tr><tr><td>Значки</td><td><code>python tools/make_icons.py</code></td><td><code>extension/icons/*.png</code></td></tr><tr><td>Сайт</td><td><code>python site_src/build.py</code></td><td><code>site/</code> и архивы в <code>site/downloads/</code></td></tr></table>
+<table><tr><th>Что</th><th>Команда</th><th>Результат</th></tr><tr><td>Windows: exe, установщик, портативная версия</td><td><code>pip install pyinstaller</code> и <code>python packaging/build_windows.py</code></td><td><code>dist/DNet.exe</code>, <code>dnet-cli.exe</code>, <code>DNet-0.4-Setup.exe</code>, <code>DNet-0.4-portable.zip</code></td></tr><tr><td>Linux / macOS: бинарник</td><td><code>pip install pyinstaller</code> и <code>python3 packaging/build_unix.py</code></td><td><code>dist/dnet-0.4-&lt;ос&gt;-&lt;арх&gt;.tar.gz</code></td></tr><tr><td>Любая система: один файл на Python</td><td><code>python packaging/build_unix.py --pyz-only</code></td><td><code>dist/dnet-0.4.pyz</code></td></tr><tr><td>Роутеры (6 архитектур)</td><td><code>pip install ziglang</code> и <code>python router/build.py</code></td><td><code>dist/router/dnetd-&lt;арх&gt;</code> + <code>SHA256SUMS</code></td></tr><tr><td>Расширение Firefox</td><td><code>python tools/build_extensions.py</code></td><td>папка <code>extension-firefox/</code></td></tr><tr><td>Значки</td><td><code>python tools/make_icons.py</code></td><td><code>extension/icons/*.png</code></td></tr><tr><td>Сайт</td><td><code>python site_src/build.py</code></td><td><code>site/</code> и архивы в <code>site/downloads/</code></td></tr></table>
 <p>PyInstaller собирает только под ту систему, на которой запущен. Поэтому в репозитории настроена <b>автосборка на GitHub Actions</b> (<code>.github/workflows/build.yml</code>): Windows, Linux (x64 и arm64), macOS (Intel и Apple Silicon) и роутеры собираются на чистых серверах.</p>
-<table><tr><th>Событие</th><th>Что происходит</th></tr><tr><td><code>git push</code> в <code>main</code> (не только правки документации и сайта)</td><td>Сборка всего, результат обновляет пререлиз <b>latest</b> на странице Releases</td></tr><tr><td>Там же</td><td>Сайт собирается со свежими программами и выкладывается в публичный репозиторий <a href="https://github.com/Arich-dev/dnet-site">dnet-site</a> (GitHub Pages: https://arich-dev.github.io/dnet-site/); доступ — deploy-ключ в секрете <code>SITE_DEPLOY_KEY</code></td></tr><tr><td>Тег <code>v*</code> (<code>git tag v0.3 &amp;&amp; git push --tags</code>)</td><td>Сборка и обычный релиз с файлами и <code>SHA256SUMS.txt</code></td></tr><tr><td>Actions → build → Run workflow</td><td>Ручная сборка, файлы доступны как артефакты запуска</td></tr></table>
+<table><tr><th>Событие</th><th>Что происходит</th></tr><tr><td><code>git push</code> в <code>main</code> (не только правки документации и сайта)</td><td>Сборка всего, результат обновляет пререлиз <b>latest</b> на странице Releases</td></tr><tr><td>Там же</td><td>Сайт собирается со свежими программами и выкладывается в публичный репозиторий <a href="https://github.com/Arich-dev/dnet-site">dnet-site</a> (GitHub Pages: https://arich-dev.github.io/dnet-site/); доступ — deploy-ключ в секрете <code>SITE_DEPLOY_KEY</code></td></tr><tr><td>Тег <code>v*</code> (<code>git tag v0.4 &amp;&amp; git push --tags</code>)</td><td>Сборка и обычный релиз с файлами и <code>SHA256SUMS.txt</code></td></tr><tr><td>Actions → build → Run workflow</td><td>Ручная сборка, файлы доступны как артефакты запуска</td></tr></table>
 <p>macOS на «хакинтоше» или обычном маке соберёт сам: <code>python3 packaging/build_unix.py</code>.</p>
         </div>
       </div>
@@ -75,9 +75,9 @@ demo_two_nodes.bat</pre>
         <h3>Скачать</h3>
         <div class="in">
           <div class="btns" style="flex-direction:column">
-            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>36.8 МБ · без прав админа</small></a>
-            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>25.8 МБ · zip</small></a>
-            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="downloads/DNet-0.4-Setup.exe">Установщик Windows<br><small>36.8 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.4-portable.zip">Переносная версия<br><small>25.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.4-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
             <a class="btn" href="download.html">Все файлы и SHA-256</a>
           </div>
         </div>
@@ -128,7 +128,7 @@ demo_two_nodes.bat</pre>
   </div>
 
   <div id="foot">
-    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    DNet 0.4 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
     Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
   </div>
 </div>

@@ -18,7 +18,7 @@
       <h1>DNet</h1>
       <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
     </div>
-    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+    <div class="ver">версия <b>0.4</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
   </div>
 
   <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
@@ -36,12 +36,12 @@
         <h2>Windows</h2>
         <div class="in">
 <p>Есть три способа. Права администратора не нужны ни в одном.</p>
-<table><tr><th>Способ</th><th>Файл</th><th>Когда выбрать</th></tr><tr><td>Установщик</td><td><code>DNet-0.3-Setup.exe</code></td><td>Обычная установка: ярлыки, автозапуск, пункт в «Установка и удаление программ»</td></tr><tr><td>Переносная версия</td><td><code>DNet-0.3-portable.zip</code></td><td>Флешка, чужой компьютер, ничего не менять в системе</td></tr><tr><td>Из исходников</td><td><code>run.bat</code> (нужен Python 3.8+)</td><td>Разработка и отладка</td></tr></table>
+<table><tr><th>Способ</th><th>Файл</th><th>Когда выбрать</th></tr><tr><td>Установщик</td><td><code>DNet-0.4-Setup.exe</code></td><td>Обычная установка: ярлыки, автозапуск, пункт в «Установка и удаление программ»</td></tr><tr><td>Переносная версия</td><td><code>DNet-0.4-portable.zip</code></td><td>Флешка, чужой компьютер, ничего не менять в системе</td></tr><tr><td>Из исходников</td><td><code>run.bat</code> (нужен Python 3.8+)</td><td>Разработка и отладка</td></tr></table>
 <h3>Установщик</h3>
-<ol><li>Запустите <code>DNet-0.3-Setup.exe</code>. Он ставит программу в <code>%LOCALAPPDATA%\Programs\DNet</code> (свою папку можно выбрать кнопкой «Обзор»).</li><li>Отметьте, нужны ли ярлык на рабочем столе, автозапуск и запуск сразу после установки.</li><li>Значок DNet появится в области уведомлений (трее). Клик по нему открывает мини-окно, двойной клик — главное окно.</li></ol>
-<p>Тихая установка для скриптов: <code>DNet-0.3-Setup.exe /S</code>. Тихое удаление: <code>"%LOCALAPPDATA%\Programs\DNet\uninstall.exe" --uninstall /S</code> (добавьте <code>--purge</code>, чтобы стереть и сохранённые страницы).</p>
+<ol><li>Запустите <code>DNet-0.4-Setup.exe</code>. Он ставит программу в <code>%LOCALAPPDATA%\Programs\DNet</code> (свою папку можно выбрать кнопкой «Обзор»).</li><li>Отметьте, нужны ли ярлык на рабочем столе, автозапуск и запуск сразу после установки.</li><li>Значок DNet появится в области уведомлений (трее). Клик по нему открывает мини-окно, двойной клик — главное окно.</li></ol>
+<p>Тихая установка для скриптов: <code>DNet-0.4-Setup.exe /S</code>. Тихое удаление: <code>"%LOCALAPPDATA%\Programs\DNet\uninstall.exe" --uninstall /S</code> (добавьте <code>--purge</code>, чтобы стереть и сохранённые страницы).</p>
 <h3>Переносная версия</h3>
-<p>Распакуйте <code>DNet-0.3-portable.zip</code> куда угодно и запустите <code>DNet.exe</code>. Пока рядом лежит файл <code>portable.txt</code>, всё (настройки, кэш страниц, значки) хранится в папке <code>data</code> рядом с программой — на компьютере ничего не остаётся. Удалите <code>portable.txt</code>, чтобы вернуться к обычной папке <code>%USERPROFILE%\.dnet</code>.</p>
+<p>Распакуйте <code>DNet-0.4-portable.zip</code> куда угодно и запустите <code>DNet.exe</code>. Пока рядом лежит файл <code>portable.txt</code>, всё (настройки, кэш страниц, значки) хранится в папке <code>data</code> рядом с программой — на компьютере ничего не остаётся. Удалите <code>portable.txt</code>, чтобы вернуться к обычной папке <code>%USERPROFILE%\.dnet</code>.</p>
 <p>В архиве есть и <code>dnet-cli.exe</code> — то же самое, но с консольным интерфейсом.</p>
 <h3>Как работает «без прав администратора»</h3>
 <ul><li>Программа ставится в папку пользователя, а не в <code>Program Files</code>.</li><li>Автозапуск — запись в <code>HKCU\...\Run</code> (только для вас), а не служба и не задача планировщика.</li><li>Все порты узла выше 1024, их можно открывать без администратора.</li><li>Единственное, что может попросить повышения, — <b>брандмауэр Windows</b>: при первом запуске он спросит, разрешить ли сеть. Нажмите «Разрешить» для частной сети. Если отказать, узел будет видеть соседей только по исходящим соединениям (см. <a href="doc-troubleshooting.html">TROUBLESHOOTING.md</a>). Правило можно добавить и вручную, это единственное действие, для которого нужен администратор:</li></ul>
@@ -55,13 +55,13 @@ netsh advfirewall firewall add rule name="DNet TCP" dir=in action=allow protocol
       <div class="box">
         <h2>Linux</h2>
         <div class="in">
-<p><b>Бинарник</b> (<code>dnet-0.3-linux-x64.tar.gz</code> или <code>-arm64</code>):</p>
-<pre data-copy>tar xzf dnet-0.3-linux-x64.tar.gz
-cd dnet-0.3-linux-x64
+<p><b>Бинарник</b> (<code>dnet-0.4-linux-x64.tar.gz</code> или <code>-arm64</code>):</p>
+<pre data-copy>tar xzf dnet-0.4-linux-x64.tar.gz
+cd dnet-0.4-linux-x64
 sh install.sh        # ставит в ~/.local/opt/dnet, без root
 dnet --gui           # окно; dnet --tray — в трей; dnet — консоль</pre>
 <p>Для значка в трее нужен <code>pystray</code> и <code>pillow</code> (<code>pip install pystray pillow</code>) в системе, где запускаете из исходников; в бинарнике окно сворачивается в панель задач.</p>
-<p><b>Чистый Python</b> (любая система, любой процессор, нужен Python 3.8+): скачайте <code>dnet-0.3.pyz</code> и запустите <code>python3 dnet-0.3.pyz</code>. Для окна нужен пакет Tk (<code>sudo apt install python3-tk</code>).</p>
+<p><b>Чистый Python</b> (любая система, любой процессор, нужен Python 3.8+): скачайте <code>dnet-0.4.pyz</code> и запустите <code>python3 dnet-0.4.pyz</code>. Для окна нужен пакет Tk (<code>sudo apt install python3-tk</code>).</p>
 <p><b>Автозапуск без root:</b></p>
 <pre data-copy>dnet --autostart on        # systemd --user, а если его нет — ~/.config/autostart
 dnet --autostart status
@@ -73,9 +73,9 @@ dnet --autostart off</pre>
       <div class="box">
         <h2>macOS</h2>
         <div class="in">
-<p>Скачайте <code>dnet-0.3-macos-arm64.tar.gz</code> (Apple Silicon) или <code>-x64.tar.gz</code> (Intel), распакуйте и выполните <code>sh install.sh</code>. Установщик кладёт программу в <code>~/Applications/DNet</code> и снимает карантинный флаг. Программа не подписана Apple: если система ругается, выполните <code>xattr -dr com.apple.quarantine ~/Applications/DNet</code>.</p>
+<p>Скачайте <code>dnet-0.4-macos-arm64.tar.gz</code> (Apple Silicon) или <code>-x64.tar.gz</code> (Intel), распакуйте и выполните <code>sh install.sh</code>. Установщик кладёт программу в <code>~/Applications/DNet</code> и снимает карантинный флаг. Программа не подписана Apple: если система ругается, выполните <code>xattr -dr com.apple.quarantine ~/Applications/DNet</code>.</p>
 <p>Значок в строке меню в macOS не поддерживается (Tk и системный трей конфликтуют в одном потоке): работают окно и консольный интерфейс. Автозапуск — LaunchAgent: <code>dnet --autostart on</code>.</p>
-<p>Без бинарника: <code>python3 dnet-0.3.pyz --gui</code> (Python 3.8+ с Tk).</p>
+<p>Без бинарника: <code>python3 dnet-0.4.pyz --gui</code> (Python 3.8+ с Tk).</p>
         </div>
       </div>
       <div class="box">
@@ -102,9 +102,9 @@ dnet --autostart off</pre>
         <h3>Скачать</h3>
         <div class="in">
           <div class="btns" style="flex-direction:column">
-            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>36.8 МБ · без прав админа</small></a>
-            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>25.8 МБ · zip</small></a>
-            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="downloads/DNet-0.4-Setup.exe">Установщик Windows<br><small>36.8 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.4-portable.zip">Переносная версия<br><small>25.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.4-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
             <a class="btn" href="download.html">Все файлы и SHA-256</a>
           </div>
         </div>
@@ -155,7 +155,7 @@ dnet --autostart off</pre>
   </div>
 
   <div id="foot">
-    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    DNet 0.4 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
     Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
   </div>
 </div>
