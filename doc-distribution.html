@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Распространение — DNet</title>
+<meta name="description" content="Раздача DNet у соседа без интернета, флешка, релизы, идеи по распространению.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Распространение</h2>
+        <div class="in">
+<p>Сеть полезна, когда в ней много узлов, а скачать программу тем, кто уже без интернета, нельзя. Поэтому способов распространения несколько, и главный из них не требует интернета.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>1. Раздача у соседа (без интернета)</h2>
+        <div class="in">
+<p>В «Настройки → Резерв, Википедия, раздача» включите <b>«Раздавать DNet соседям по сети»</b>. Узел откроет в локальной сети маленькую страницу <code>http://&lt;адрес узла&gt;:48557/</code> (адрес показан в окне). С телефона, ноутбука или другого компьютера в этой же сети открывается страница с кнопками:</p>
+<ul><li>программа DNet (то, что запущено у вас: <code>DNet.exe</code> или <code>dnet.pyz</code>);</li><li>расширение для Chrome / Edge / Brave (<code>dnet-chrome.zip</code>) и для Firefox (<code>dnet-firefox.xpi</code>);</li><li>инструкция «ПРОЧТИ-МЕНЯ.txt» и контрольная сумма программы.</li></ul>
+<p>Соседи с DNet видят в списке «Соседи» отметку <b>«раздаёт DNet»</b>; двойной клик открывает его страницу загрузки. Отдаётся только сама программа и расширения: настройки, кэш и страницы не отдаются никогда. Раздача выключена по умолчанию; порт <code>48557</code> (<code>DNET_SHARE_PORT</code>); включайте её в сетях, где вы не против, чтобы любой желающий скачал программу.</p>
+<p>Включить можно и в <code>config.json</code>: <code>"share": {"enabled": true}</code>.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>2. Флешка</h2>
+        <div class="in">
+<p>«Сохранить на флешку…» в тех же настройках (или <code>DNet.exe --export D:\</code>) кладёт в папку <code>DNet-share</code> программу, оба расширения и инструкцию. Дальше как угодно: флешка, Bluetooth, обмен файлами по Wi-Fi Direct.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>3. Интернет (пока он есть)</h2>
+        <div class="in">
+<table><tr><th>Канал</th><th>Что это</th></tr><tr><td><a href="https://github.com/Arich-dev/Dnet/releases">GitHub Releases</a></td><td>Свежая сборка каждого коммита (пререлиз <code>latest</code>) и релизы по тегам <code>v*</code></td></tr><tr><td><a href="https://arich-dev.github.io/dnet-site/">Сайт</a></td><td>Установщик, переносная версия, бинарники для Linux и macOS, расширения, роутеры, документация</td></tr><tr><td>Прямая ссылка</td><td>Адрес <code>…/downloads/DNet-0.3-Setup.exe</code> можно отправить в мессенджере</td></tr></table>
+        </div>
+      </div>
+      <div class="box">
+        <h2>4. Идеи на будущее</h2>
+        <div class="in">
+<ul><li><b>Менеджеры пакетов:</b> winget, Scoop, Homebrew, AUR, <code>.deb</code> — установка одной командой.</li><li><b>Магазины расширений:</b> Chrome Web Store и addons.mozilla.org (подпись Mozilla), чтобы не нужен был режим разработчика.</li><li><b>Роутеры:</b> готовый пакет для OpenWrt-фида, образы прошивок с <code>dnetd</code>.</li><li><b>Точки раздачи:</b> библиотеки, школы, кафе: любой узел с включённой раздачей, плюс листовка с QR-кодом страницы.</li><li><b>Список начальных адресов</b> (<code>peers.json</code> на сайте, <code>bootstrap</code>): чтобы новый узел сразу находил супер-узлы в городе (см. <a href="doc-discovery.html">DISCOVERY.md</a>).</li></ul>
+        </div>
+      </div>
+      <div class="box">
+        <h2>О самораспространении</h2>
+        <div class="in">
+<p>Программа, которая сама лезет на чужие компьютеры (через уязвимости вроде SMB1 или без согласия владельца), — это червь: нелегально и вредно, и DNet такого не делает и делать не будет. Раздача у соседа выше — её законный аналог: человек сам открывает страницу, сам скачивает и сам решает, запускать ли.</p>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>36.8 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>25.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
