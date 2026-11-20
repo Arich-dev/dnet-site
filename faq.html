@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAQ и если не работает — DNet</title>
+<meta name="description" content="Ответы на частые вопросы про DNet и разбор типичных проблем: страница не сохраняется, соседи не находятся, VPN, школьная сеть.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html">Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html" class=on>FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Если не работает</h2>
+        <div class="in">
+          <h3>Страница не сохраняется</h3>
+          <p>Проверь, что узел запущен (кнопка расширения покажет «Узел работает»), что расширение <b>включено</b> (переключатель в его окне; когда выключено, на иконке бейдж «OFF») и что оно перезагружено после обновления. Страница не сохранится, если в адресе есть параметры
+          (<code>?…</code>), это поиск, почта, вход или кабинет — см. <a href="privacy.html">правила приватности</a>. Ещё не сохраняются редиректы, не-HTML и страницы тяжелее 20 МБ.
+          Запусти узел с <code>--debug</code>: в логе будет строка <code>save … skipped (private)</code> или ошибка.</p>
+
+          <h3>Узлы не видят друг друга</h3>
+          <ol>
+            <li>Проверь файрвол: нужны <b>UDP 48555</b> и <b>TCP 48556</b>. На Windows при первом запуске разреши DNet в частной сети.</li>
+            <li>Попробуй достучаться: <code>Test-NetConnection IP_СОСЕДА -Port 48556</code> (PowerShell) или <code>nc -vz IP_СОСЕДА 48556</code>.</li>
+            <li>UDP-маяк не проходит между подсетями и плохо работает в сетях, не похожих на /24. Пропиши адрес соседа в <code>static_peers</code> — достаточно с одной стороны, но порт соседа должен быть доступен.</li>
+            <li>Запусти с <code>--debug</code> и смотри строки <code>beacon from …</code> и <code>peer+ …</code>.</li>
+          </ol>
+
+          <h3>Узел на ноутбуке, а сосед за VPN</h3>
+          <p>Многие VPN заворачивают в туннель всё, включая локальную подсеть. Проверь маршрут: <code>Find-NetRoute -RemoteIPAddress IP_СОСЕДА</code> (должен идти не через интерфейс VPN).
+          Добавь локальные подсети и адреса соседей в исключения VPN.</p>
+
+          <h3>Школа, работа, чужая сеть</h3>
+          <p>Wi-Fi часто изолирован от проводной сети, и трафик между ними шлюз не пропускает (<code>tracert</code> до соседа заканчивается на шлюзе с «Destination unreachable»).
+          Тогда соседей нужно искать в той же подсети. И выключи сканер: <code>"probe": {"enabled": false}</code>, он похож на сканирование портов.</p>
+
+          <h3>Расширение не открывает копию при обрыве</h3>
+          <p>Подмена срабатывает на ошибки сети: нет соединения, DNS, таймаут, сброс или отказ соединения. Страница должна быть сохранена ранее у тебя или у соседа.
+          Если отключаешь интернет, отключай его у роутера, а не Wi-Fi на самом компьютере — иначе пропадёт и связь с соседями.</p>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Вопросы</h2>
+        <div class="in">
+          <h3>Работает ли это совсем без интернета?</h3>
+          <p>Да, если страница уже была сохранена кем-то в сети. Узлы обмениваются по локальной сети, интернет нужен только чтобы получить новое.</p>
+
+          <h3>Зачем роутер?</h3>
+          <p>Он включён всегда и стоит между подсетями, поэтому лучше всего подходит для обнаружения. Маяк <code>dnetd</code> весит около 20 КБ, не использует потоков, лог держит в 4 КБ.
+          Страниц он не хранит.</p>
+
+          <h3>Что такое супер-узел?</h3>
+          <p>Узел с большим кэшем, который сам копирует страницы соседей и докачивает из интернета то, что просили другие. Включается <code>"super": {"enabled": true}</code>.</p>
+
+          <h3>Как очистить кэш?</h3>
+          <p>Кнопка «Очистить» в панели узла (только на самом узле) или удалить файл <code>pages.db</code> в папке <code>~/.dnet</code> при остановленном узле.</p>
+
+          <h3>Где хранятся данные?</h3>
+          <p>В <code>~/.dnet</code> (на Windows <code>C:\Users\имя\.dnet</code>): <code>config.json</code>, <code>pages.db</code> и <code>debug.log</code> при запуске с <code>--debug</code>.</p>
+
+          <h3>Можно ли запустить два узла на одном компьютере?</h3>
+          <p>Да, для тестов: смени порты переменными <code>DNET_UDP_PORT</code>, <code>DNET_TCP_PORT</code>, <code>DNET_API_PORT</code> и папку <code>DNET_HOME</code>. Готовый вариант — <code>demo_two_nodes.bat</code>.</p>
+
+          <h3>Работает ли в Firefox, Edge, на телефоне?</h3>
+          <p>Есть расширения для Chrome (Manifest V3, подходят и другие браузеры на Chromium: Edge, Brave, Opera) и для Firefox (пока временное, без подписи Mozilla; в самом Firefox не проверялось). На телефоне узла нет.</p>
+
+          <h3>Безопасно ли это?</h3>
+          <p>Для домашней сети да, при условии что ты доверяешь всем её устройствам: страницы между узлами не подписываются и не шифруются. Личное (поиск, почта, кабинеты, адреса с параметрами)
+          в кэш не попадает. Подробности — в разделе <a href="privacy.html">«Безопасность»</a>.</p>
+
+          <h3>Какая лицензия?</h3>
+          <p>Лицензия пока не выбрана: проект учебный.</p>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Установка — DNet</title>
+<meta name="description" content="Установка на Windows, Linux, macOS и роутеры, расширения для Chrome и Firefox, работа без прав администратора.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Установка</h2>
+        <div class="in">
+<p>DNet состоит из трёх частей: <b>узел</b> (программа на компьютере), <b>расширение браузера</b> и, по желанию, <b>маяк для роутера</b>. Узел можно поставить без прав администратора.</p>
+<p>Все готовые файлы собираются в папку <code>dist/</code> командами из <a href="doc-build.html">BUILD.md</a> и лежат на странице «Скачать» сайта.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Windows</h2>
+        <div class="in">
+<p>Есть три способа. Права администратора не нужны ни в одном.</p>
+<table><tr><th>Способ</th><th>Файл</th><th>Когда выбрать</th></tr><tr><td>Установщик</td><td><code>DNet-0.3-Setup.exe</code></td><td>Обычная установка: ярлыки, автозапуск, пункт в «Установка и удаление программ»</td></tr><tr><td>Переносная версия</td><td><code>DNet-0.3-portable.zip</code></td><td>Флешка, чужой компьютер, ничего не менять в системе</td></tr><tr><td>Из исходников</td><td><code>run.bat</code> (нужен Python 3.8+)</td><td>Разработка и отладка</td></tr></table>
+<h3>Установщик</h3>
+<ol><li>Запустите <code>DNet-0.3-Setup.exe</code>. Он ставит программу в <code>%LOCALAPPDATA%\Programs\DNet</code> (свою папку можно выбрать кнопкой «Обзор»).</li><li>Отметьте, нужны ли ярлык на рабочем столе, автозапуск и запуск сразу после установки.</li><li>Значок DNet появится в области уведомлений (трее). Клик по нему открывает мини-окно, двойной клик — главное окно.</li></ol>
+<p>Тихая установка для скриптов: <code>DNet-0.3-Setup.exe /S</code>. Тихое удаление: <code>"%LOCALAPPDATA%\Programs\DNet\uninstall.exe" --uninstall /S</code> (добавьте <code>--purge</code>, чтобы стереть и сохранённые страницы).</p>
+<h3>Переносная версия</h3>
+<p>Распакуйте <code>DNet-0.3-portable.zip</code> куда угодно и запустите <code>DNet.exe</code>. Пока рядом лежит файл <code>portable.txt</code>, всё (настройки, кэш страниц, значки) хранится в папке <code>data</code> рядом с программой — на компьютере ничего не остаётся. Удалите <code>portable.txt</code>, чтобы вернуться к обычной папке <code>%USERPROFILE%\.dnet</code>.</p>
+<p>В архиве есть и <code>dnet-cli.exe</code> — то же самое, но с консольным интерфейсом.</p>
+<h3>Как работает «без прав администратора»</h3>
+<ul><li>Программа ставится в папку пользователя, а не в <code>Program Files</code>.</li><li>Автозапуск — запись в <code>HKCU\...\Run</code> (только для вас), а не служба и не задача планировщика.</li><li>Все порты узла выше 1024, их можно открывать без администратора.</li><li>Единственное, что может попросить повышения, — <b>брандмауэр Windows</b>: при первом запуске он спросит, разрешить ли сеть. Нажмите «Разрешить» для частной сети. Если отказать, узел будет видеть соседей только по исходящим соединениям (см. <a href="doc-troubleshooting.html">TROUBLESHOOTING.md</a>). Правило можно добавить и вручную, это единственное действие, для которого нужен администратор:</li></ul>
+<pre data-copy>netsh advfirewall firewall add rule name="DNet" dir=in action=allow protocol=UDP localport=48555
+netsh advfirewall firewall add rule name="DNet TCP" dir=in action=allow protocol=TCP localport=48556</pre>
+<ul><li>Если нужен узел для <b>всех пользователей</b> и до входа в систему, включите режим службы: <code>DNet.exe --autostart on --system</code> из консоли администратора (создаёт задачу планировщика от имени SYSTEM, которая запускается при загрузке).</li></ul>
+<h3>Windows SmartScreen и антивирус</h3>
+<p>Сборки не подписаны сертификатом, поэтому SmartScreen может написать «Windows защитила ваш компьютер»: нажмите «Подробнее → Выполнить в любом случае». Одиночные exe, собранные PyInstaller, иногда ложно срабатывают у антивирусов. Контрольные суммы SHA-256 лежат на странице «Скачать»; кому важно, может собрать всё сам (<code>python packaging/build_windows.py</code>) или запускать из исходников.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Linux</h2>
+        <div class="in">
+<p><b>Бинарник</b> (<code>dnet-0.3-linux-x64.tar.gz</code> или <code>-arm64</code>):</p>
+<pre data-copy>tar xzf dnet-0.3-linux-x64.tar.gz
+cd dnet-0.3-linux-x64
+sh install.sh        # ставит в ~/.local/opt/dnet, без root
+dnet --gui           # окно; dnet --tray — в трей; dnet — консоль</pre>
+<p>Для значка в трее нужен <code>pystray</code> и <code>pillow</code> (<code>pip install pystray pillow</code>) в системе, где запускаете из исходников; в бинарнике окно сворачивается в панель задач.</p>
+<p><b>Чистый Python</b> (любая система, любой процессор, нужен Python 3.8+): скачайте <code>dnet-0.3.pyz</code> и запустите <code>python3 dnet-0.3.pyz</code>. Для окна нужен пакет Tk (<code>sudo apt install python3-tk</code>).</p>
+<p><b>Автозапуск без root:</b></p>
+<pre data-copy>dnet --autostart on        # systemd --user, а если его нет — ~/.config/autostart
+dnet --autostart status
+dnet --autostart off</pre>
+<p>Чтобы пользовательская служба работала и без входа в систему: <code>loginctl enable-linger $USER</code>. Для сервера или платы (на весь компьютер): <code>sudo dnet --autostart on --system</code> — ставит <code>/etc/systemd/system/dnet.service</code>. Готовый шаблон лежит в <code>deploy/dnet.service</code>.</p>
+<p>Порты, которые надо разрешить в файрволе: UDP 48555 и TCP 48556 (<code>sudo ufw allow 48555/udp &amp;&amp; sudo ufw allow 48556/tcp</code>).</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>macOS</h2>
+        <div class="in">
+<p>Скачайте <code>dnet-0.3-macos-arm64.tar.gz</code> (Apple Silicon) или <code>-x64.tar.gz</code> (Intel), распакуйте и выполните <code>sh install.sh</code>. Установщик кладёт программу в <code>~/Applications/DNet</code> и снимает карантинный флаг. Программа не подписана Apple: если система ругается, выполните <code>xattr -dr com.apple.quarantine ~/Applications/DNet</code>.</p>
+<p>Значок в строке меню в macOS не поддерживается (Tk и системный трей конфликтуют в одном потоке): работают окно и консольный интерфейс. Автозапуск — LaunchAgent: <code>dnet --autostart on</code>.</p>
+<p>Без бинарника: <code>python3 dnet-0.3.pyz --gui</code> (Python 3.8+ с Tk).</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Расширение браузера</h2>
+        <div class="in">
+<p>Расширение сохраняет открытые страницы на узел и подменяет ошибки сети копией. Узел должен быть запущен.</p>
+<p><b>Chrome, Edge, Brave, Opera, Яндекс Браузер</b> (одна и та же папка):</p>
+<ol><li>Откройте <code>chrome://extensions</code> (в Edge — <code>edge://extensions</code>), включите «Режим разработчика».</li><li>«Загрузить распакованное расширение» → папка <code>extension</code> (в установщике и портативной версии лежит рядом с программой).</li></ol>
+<p><b>Firefox:</b></p>
+<ol><li>Откройте <code>about:debugging#/runtime/this-firefox</code> → «Загрузить временное дополнение…» → файл <code>manifest.json</code> из папки <code>extension-firefox</code>. Так расширение работает до закрытия браузера.</li><li>Постоянная установка: Firefox Developer Edition или Nightly с <code>xpinstall.signatures.required = false</code> в <code>about:config</code>, затем установите файл <code>dnet-firefox.xpi</code>. Для обычного Firefox нужна подпись Mozilla (AMO), её у проекта пока нет.</li></ol>
+<p>В окне расширения есть переключатель «Включено/Выключено» и поле «Адрес узла» — на случай, если вы поменяли порт (<code>DNET_API_PORT</code>).</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Роутер</h2>
+        <div class="in">
+<p>Смотрите <a href="doc-routers.html">ROUTERS.md</a>: готовые бинарники под MIPS, ARM, AArch64 и x86 и установка одной командой.</p>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Безопасность и приватность — DNet</title>
+<meta name="description" content="Что DNet не сохраняет, как защищены страницы и узел и какие ограничения у сети без подписей и шифрования.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html">Документация</a><a href="privacy.html" class=on>Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Что не сохраняется</h2>
+        <div class="in">
+          <p>Сеть общая, поэтому личное в неё не должно попадать. Одно правило действует и в расширении, и на узле, и при обмене: страница, под него попавшая,
+          не сохраняется, не отдаётся соседям и вычищается из кэша при старте.</p>
+          <table>
+            <tr><th>Что</th><th>Почему</th></tr>
+            <tr><td>Режим инкогнито, локальные адреса</td><td>Не для чужих глаз.</td></tr>
+            <tr><td>Поисковики: Google, Яндекс, Bing, DuckDuckGo, Yahoo, Ecosia, Baidu, Brave Search</td><td>В адресе — твой запрос.</td></tr>
+            <tr><td>Любые адреса с параметрами (<code>?…</code>), логином в адресе, нестандартным портом</td><td>Параметры часто несут личное: запросы, идентификаторы, сессии.</td></tr>
+            <tr><td>Почта и кабинеты: имя сайта начинается с <code>mail.</code>, <code>accounts.</code>, <code>login.</code>, <code>sso.</code>, <code>bank.</code>, <code>passport.</code>, <code>id.</code>, <code>my.</code> и подобных</td><td>Закрытые разделы.</td></tr>
+            <tr><td>Пути <code>/login</code>, <code>/account</code>, <code>/checkout</code>, <code>/cart</code>, <code>/admin</code>, <code>/profile</code>, <code>/settings</code>, <code>/messages</code> и подобные</td><td>Вход, оплата, профиль.</td></tr>
+          </table>
+          <p class="mut">Правила лежат в <code>daemon/policy.py</code> и <code>extension/background.js</code> и легко правятся. Побочный эффект: часть обычных сайтов (например, всё на <code>google.*</code>) тоже не сохраняется.</p>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Как защищены страницы и узел</h2>
+        <div class="in">
+          <ul>
+            <li>Сохраняется <b>публичная</b> версия страницы: запрос уходит без cookies, поэтому закрытое содержимое за входом в кэш не попадает.</li>
+            <li>Сохранённые копии открываются с <code>Content-Security-Policy: sandbox</code> — скрипты в них не выполняются.</li>
+            <li>Запись в кэш и его очистка разрешены только с самого узла. Очистка сверяет <code>Origin</code>, чтобы посторонний сайт не мог вызвать её из твоего браузера.</li>
+            <li>Получатель сверяет, что ключ страницы совпадает с хэшем адреса, тип — <code>text/html</code>, а адрес не приватный.</li>
+            <li>Панель по умолчанию слушает только <code>127.0.0.1</code>. Если открыть её для сети (<code>api_bind</code>), все в сети смогут читать список и копии, но не писать.</li>
+            <li>Маяк на роутере ограничивает таблицу (64 записи, 8 с адреса) и частоту соединений (40 в секунду).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Что не защищено</h2>
+        <div class="in">
+          <div class="note"><b>Страницы между узлами не подписываются и не шифруются.</b> Злой узел в вашей сети может отдать чужой HTML под настоящим адресом — получатель проверит формат
+          и хэш адреса, но не личность соседа. Для домашней или учебной сети это допустимо, для открытой — нет.</div>
+          <ul>
+            <li>Обмен идёт открытым текстом по TCP. Любой в сети видит, какие страницы переходят между узлами.</li>
+            <li>У соседей виден список адресов, которые ты сохранил (за вычетом приватных по правилам выше).</li>
+            <li>Сканер подсетей похож на сканирование портов. В школьной или рабочей сети его лучше выключить: <code>"probe": {"enabled": false}</code>.</li>
+            <li>Если в списке <code>static_peers</code> стоит чужой адрес, узел будет с ним знакомиться.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Что дальше</h2>
+        <div class="in">
+          <ul>
+            <li>Подписи страниц и проверка подлинности узлов.</li>
+            <li>Шифрование канала между узлами.</li>
+            <li>Настраиваемый список исключений без правки кода.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

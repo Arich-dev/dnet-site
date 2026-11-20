@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Как это работает — DNet</title>
+<meta name="description" content="От открытой страницы до копии при обрыве: сохранение, поиск соседей, обмен страницами, уровни сети и сканер подсетей.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html" class=on>Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html">Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Общая схема</h2>
+        <div class="in">
+<pre>
+  Chrome + расширение                 локальный узел (127.0.0.1:8765)
+  ┌───────────────────┐   POST /save   ┌─────────────────────────┐
+  │ открыл страницу   │ ─────────────▶ │ SQLite: pages.db        │
+  │ ошибка сети       │ ◀───────────── │ GET /page?url=...       │
+  └───────────────────┘   копия        └───────────┬─────────────┘
+                                                   │ TCP 48556 (JSON)
+                       UDP 48555 (маяк)            │ hello · peers · index · get · want
+   ┌──────────────┐◀───────────────────────────────┼──────────────────┐
+   │ узел соседа  │   ┌──────────────┐  ┌──────────▼─────┐   ┌────────┴─────┐
+   └──────────────┘   │ супер-узел   │  │ роутер  dnetd  │   │ узел (плата) │
+                      └──────────────┘  └────────────────┘   └──────────────┘
+</pre>
+          <ol class="steps">
+            <li><b>Сохранение.</b> После загрузки страницы расширение скачивает её публичную версию (без cookies) и отдаёт узлу. Страницы с параметрами, поиск и вход пропускаются.</li>
+            <li><b>Поиск соседей.</b> Каждые 15 с узел шлёт UDP-маяк в свои подсети, соседи отвечают по TCP. Раз в 20 с узлы обмениваются списками соседей (до 5 новых адресов за раз), так что хватает знать одного.</li>
+            <li><b>Запрос страницы.</b> Нет у себя — узел спрашивает соседей, сначала ближайших по TTL ответа ping, и сохраняет копию.</li>
+            <li><b>Отказ интернета.</b> Расширение видит ошибку сети (нет соединения, DNS, таймаут) и подменяет вкладку копией с узла. Сверху жёлтая плашка «Копия из сети DNet от …».</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Пять уровней сети</h2>
+        <div class="in">
+          <p>Каждые 10 секунд монитор проверяет пять уровней — сначала ping, затем TCP на порты 443, 80, 53. Если дальний уровень достижим,
+          ближние считаются рабочими автоматически. Так узел знает не просто «интернета нет», а <i>где</i> обрыв.</p>
+          <table>
+            <tr><th>Уровень</th><th>Чем проверяется</th></tr>
+            <tr><td>Дом</td><td>шлюз по умолчанию (определяется сам)</td></tr>
+            <tr><td>Провайдер</td><td>первый публичный адрес на пути traceroute (определяется сам) или хост из конфига</td></tr>
+            <tr><td>Город</td><td>хост из конфига (<code>targets.city</code>), пусто = пропуск</td></tr>
+            <tr><td>Страна</td><td><code>ya.ru</code> по умолчанию</td></tr>
+            <tr><td>Мир</td><td><code>1.1.1.1</code> по умолчанию</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Сканер подсетей</h2>
+        <div class="in">
+          <p>Обходит подсети /24 по пути до дальнего уровня и свои локальные (64 параллельных проверки TCP на порт обмена) и знакомится с найденными узлами.
+          Пока интернет есть — раз в 30 минут, при обрыве — раз в 2 минуты и с более долгим хранением найденных соседей. Публичные подсети сканируются
+          только при живой цепочке до них и в рамках лимита <code>probe.max_hosts</code>.</p>
+          <div class="note">В чужих сетях (школа, работа) сканер лучше выключить: <code>"probe": {"enabled": false}</code> в конфиге. Маяка и <code>static_peers</code> хватает.</div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Жизнь страницы</h2>
+        <div class="in">
+          <ul>
+            <li>Хранится в SQLite, сжатая zlib. Срок — 14 дней, лимит кэша — 200 МБ (у супер-узла 2 ГБ). Самые старые удаляются первыми.</li>
+            <li>У каждой страницы ключ — SHA-256 нормализованного адреса (без <code>#фрагмента</code>). Сосед не может подсунуть страницу под чужим адресом: получатель сверяет ключ с адресом.</li>
+            <li>Получив страницу от соседа, узел сохраняет её у себя и сохраняет исходное время — копия «стареет» так же, как оригинал.</li>
+            <li>Если страницы нет ни у кого, узел просит супер-узлы скачать её из интернета (<code>want</code>), когда там появится выход.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Что проверено — DNet</title>
+<meta name="description" content="Честный список: что DNet реально запускалось на железе, что только написано, известные ограничения и планы.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html">Документация</a><a href="privacy.html">Безопасность</a><a href="status.html" class=on>Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Проверено на железе</h2>
+        <div class="in">
+          <table>
+            <tr><th>Устройство</th><th class="c">Статус</th><th>Что именно</th></tr>
+            <tr><td>ПК, Windows 10, Python 3.13</td><td class="c"><span class="pill dark">работает</span></td><td>Узел, расширение Chrome (сохранение страниц), панель, окно расширения, <code>run.bat</code>.</td></tr>
+            <tr><td>DragonBoard 410c, Debian sid, ядро 5.15, ARM64</td><td class="c"><span class="pill dark">работает</span></td><td>Узел на Python 3.9; плата нашла компьютер по UDP-маяку сама; страница передалась по сети за ~0,13 с; супер-узел зеркалит новые страницы за ~20 с; автозапуск через systemd.</td></tr>
+            <tr><td>Два узла на одном компьютере</td><td class="c"><span class="pill dark">работает</span></td><td>Настоящий протокол на разных портах: список «у соседа», открытие страницы с другого узла.</td></tr>
+            <tr><td>Окно, значок в трее, мини-окно (Windows 10)</td><td class="c"><span class="pill dark">работает</span></td><td>Все вкладки, настройки, мини-окно по клику на значок, смена цвета значка; тест на реальном рабочем столе.</td></tr>
+            <tr><td><code>DNet.exe</code>, портативная версия, установщик (Windows 10)</td><td class="c"><span class="pill dark">работает</span></td><td>Запуск без Python, режим <code>portable.txt</code>, тихая установка и удаление без прав администратора, автозапуск через <code>HKCU\Run</code>.</td></tr>
+            <tr><td>Маяк <code>dnetd</code> на DragonBoard</td><td class="c"><span class="pill dark">собран, работает</span></td><td>Собрался родным gcc 11 с <code>-Wall -Wextra</code> без предупреждений, 19,8 КБ; компьютер увидел его как <code>router</code>; лог создаётся и сбрасывается при запуске.</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Написано, но не проверено</h2>
+        <div class="in">
+          <table>
+            <tr><th>Что</th><th class="c">Статус</th><th>Комментарий</th></tr>
+            <tr><td>NanoPi NEO2</td><td class="c"><span class="pill">подготовлено</span></td><td>Образ Armbian записан на карту; запуска пока не было.</td></tr>
+            <tr><td>Banana Pi W2, BeagleBone Black</td><td class="c"><span class="pill dim">в планах</span></td><td>Образ для W2 скачан.</td></tr>
+            <tr><td>Бинарники <code>dnetd</code> под MIPS, ARM, AArch64, x86</td><td class="c"><span class="pill">собраны, не запускались</span></td><td>Кросс-сборка через zig без предупреждений; формат файлов проверен, но на реальных роутерах запуска ещё не было. Главный тест — TP-Link WR741N (OpenWrt, MIPS).</td></tr>
+            <tr><td>Расширение для Firefox</td><td class="c"><span class="pill">написано, не проверено</span></td><td>Общий код с Chrome, манифест Manifest V2. В самом Firefox пока не загружалось.</td></tr>
+            <tr><td>Бинарники Linux и macOS</td><td class="c"><span class="pill dim">через CI</span></td><td>Собираются на GitHub Actions и командой <code>packaging/build_unix.py</code>; в Linux и macOS не запускались. Версия <code>.pyz</code> запущена на Windows.</td></tr>
+            <tr><td>Роутер TP-Link WR741N (OpenWrt, MIPS)</td><td class="c"><span class="pill dim">в планах</span></td><td>Главный тест маяка на 4 МБ флеша.</td></tr>
+            <tr><td>Автозапуск: OpenWrt, Keenetic, DD-WRT, NetBSD</td><td class="c"><span class="pill dim">не проверено</span></td><td>Скрипты написаны, на реальных роутерах не запускались.</td></tr>
+            <tr><td>Bluetooth RFCOMM</td><td class="c"><span class="pill dim">не проверено</span></td><td>Код есть, на устройствах не пробовался.</td></tr>
+            <tr><td>MikroTik в контейнере</td><td class="c"><span class="pill dim">не готово</span></td><td>Возможно только на ARM/x86 с RouterOS 7.5+.</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Известные ограничения</h2>
+        <div class="in">
+          <ul>
+            <li><b>Широковещательный адрес считается как для /24.</b> В подсетях другого размера (например /27) UDP-маяк может не дойти; выручают <code>static_peers</code> и маяк на роутере. Расчёт по реальной маске — в планах.</li>
+            <li><b>Узлы в разных подсетях.</b> Если сеть не пропускает трафик между сегментами (школьный Wi-Fi и проводная сеть, например), узлы друг друга не увидят — проверено на практике.</li>
+            <li><b>VPN.</b> Если VPN заворачивает в туннель и локальную подсеть, трафик до соседей не дойдёт. Добавь локальные подсети в исключения VPN.</li>
+            <li><b>«Прыжки»</b> считаются по TTL ответа ping (приблизительно); Windows по умолчанию на ping не отвечает — тогда число прыжков не определяется.</li>
+            <li>Без <code>traceroute</code> не работают автоопределение провайдера и путь до цели; остальное работает.</li>
+            <li>Расширение для Firefox временное (без подписи Mozilla); Chrome требует режима разработчика.</li>
+            <li>Значок в трее есть в Windows и (с <code>pystray</code>) в Linux; в macOS — только окно.</li>
+            <li>Сборки не подписаны сертификатом: SmartScreen и антивирусы могут ругаться.</li>
+            <li>Нет подписей и шифрования — см. <a href="privacy.html">«Безопасность»</a>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Планы</h2>
+        <div class="in">
+          <ul>
+            <li>Проверить <code>dnetd</code> на OpenWrt (WR741N), запустить бинарники на других роутерах.</li>
+            <li>Запустить остальные платы (NanoPi, Banana Pi, BeagleBone).</li>
+            <li>Считать широковещательные адреса по маске подсети.</li>
+            <li>Подписи страниц, проверка подлинности узлов, шифрование канала.</li>
+            <li>Подпись расширения (AMO, Chrome Web Store) и сборок, настраиваемые исключения приватности.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Журнал изменений</h2>
+        <div class="in">
+          <ul>
+            <li><b>0.3</b> — окно с вкладками и значок в трее с мини-окном, автозапуск без прав администратора (Windows, Linux, macOS), расширение для Firefox и переработанное для Chrome (настраиваемый адрес узла, значки, проверка копии перед подменой), готовые программы: установщик, переносная версия, бинарники Linux и macOS, <code>.pyz</code>; маяк для роутеров под 6 архитектур с <code>install.sh</code> и пакетом OpenWrt; документация.</li>
+            <li><b>0.2</b> — панель узла и окно расширения, фильтр приватных страниц, режим <code>--debug</code> с окном логов, страницы «у соседа» в панели, маяк <code>dnetd</code> для роутеров с логом, автозапуск (systemd и скрипты для роутеров), <code>run.bat</code> и демонстрация на одном компьютере.</li>
+            <li><b>0.1</b> — узел, обнаружение соседей, обмен страницами, расширение Chrome.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

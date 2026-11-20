@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Настройки — DNet</title>
+<meta name="description" content="Все параметры config.json, переменные окружения, порты и папки данных.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Настройки</h2>
+        <div class="in">
+<p>Все настройки можно менять в окне (вкладка «Настройки») или вручную в файле <code>config.json</code>. Файл создаётся при первом запуске.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Где лежат данные</h2>
+        <div class="in">
+<table><tr><th>Режим</th><th>Папка</th></tr><tr><td>Обычный</td><td><code>%USERPROFILE%\.dnet</code> (Windows), <code>~/.dnet</code> (Linux, macOS)</td></tr><tr><td>Переносной</td><td><code>data</code> рядом с программой, если рядом лежит <code>portable.txt</code></td></tr><tr><td>Своя</td><td>переменная <code>DNET_HOME</code> (важнее всего остального)</td></tr></table>
+<p>В папке: <code>config.json</code>, кэш <code>pages.db</code> (SQLite, страницы сжаты), <code>debug.log</code> (только с <code>--debug</code>, не больше 2 МБ), <code>icons/</code> (значки трея).</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>config.json</h2>
+        <div class="in">
+<table><tr><th>Ключ</th><th>По умолчанию</th><th>Смысл</th></tr><tr><td><code>id</code></td><td>случайный</td><td>Идентификатор узла. Не копируйте конфиг на другой компьютер — у двух узлов не должно быть одного <code>id</code></td></tr><tr><td><code>nick</code></td><td>имя компьютера</td><td>Имя в списках соседей (до 32 символов)</td></tr><tr><td><code>api_bind</code></td><td><code>127.0.0.1</code></td><td>Адрес панели и API. <code>0.0.0.0</code> — смотреть панель с других компьютеров; запись и очистка кэша остаются только с самого узла</td></tr><tr><td><code>ttl_days</code></td><td>14</td><td>Сколько хранить страницы</td></tr><tr><td><code>max_mb</code></td><td>200</td><td>Лимит кэша; самые старые страницы удаляются первыми</td></tr><tr><td><code>targets.provider</code></td><td>пусто (определяется само)</td><td>Хост провайдера для проверки уровня</td></tr><tr><td><code>targets.city</code></td><td>пусто</td><td>Хост в вашем городе; пусто — уровень пропускается</td></tr><tr><td><code>targets.country</code></td><td><code>ya.ru</code></td><td>Хост «страны»</td></tr><tr><td><code>targets.world</code></td><td><code>1.1.1.1</code></td><td>Хост «мира»</td></tr><tr><td><code>static_peers</code></td><td><code>[]</code></td><td>Соседи вне вашей подсети: <code>"203.0.113.5"</code> или <code>"203.0.113.5:48556"</code></td></tr><tr><td><code>probe.enabled</code></td><td><code>true</code></td><td>Сканер подсетей</td></tr><tr><td><code>probe.max_hosts</code></td><td>254</td><td>Бюджет адресов в чужих (публичных) подсетях</td></tr><tr><td><code>super.enabled</code></td><td><code>false</code></td><td>Режим супер-узла</td></tr><tr><td><code>super.max_mb</code></td><td>2000</td><td>Лимит кэша супер-узла</td></tr><tr><td><code>super.batch</code></td><td>20</td><td>Сколько страниц копировать за цикл</td></tr><tr><td><code>bluetooth.enabled</code></td><td><code>false</code></td><td>Bluetooth RFCOMM</td></tr><tr><td><code>bluetooth.channel</code></td><td>4</td><td>Канал RFCOMM</td></tr><tr><td><code>bluetooth.peers</code></td><td><code>[]</code></td><td>MAC-адреса соседей. Автопоиск устройств работает при установленном PyBluez</td></tr></table>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Переменные окружения</h2>
+        <div class="in">
+<table><tr><th>Переменная</th><th>Назначение</th></tr><tr><td><code>DNET_HOME</code></td><td>Папка данных</td></tr><tr><td><code>DNET_API_PORT</code></td><td>Порт панели и API (по умолчанию 8765)</td></tr><tr><td><code>DNET_UDP_PORT</code> / <code>DNET_TCP_PORT</code></td><td>Порты маяка и обмена (48555 / 48556). Меняйте только для тестов нескольких узлов на одном компьютере: остальные узлы ждут стандартные порты</td></tr><tr><td><code>DNET_STATIC_PEERS</code></td><td>Соседи через запятую (добавляются к <code>static_peers</code>)</td></tr><tr><td><code>DNET_NO_PROBE</code></td><td>Выключить сканер</td></tr><tr><td><code>NO_COLOR</code></td><td>Без цветов в консоли</td></tr></table>
+<p>Если поменяли порт панели, укажите новый адрес в окне расширения («Адрес узла»).</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Порты</h2>
+        <div class="in">
+<table><tr><th>Порт</th><th>Протокол</th><th>Назначение</th><th>Куда открывать</th></tr><tr><td>48555</td><td>UDP</td><td>Маяк</td><td>Локальная сеть</td></tr><tr><td>48556</td><td>TCP</td><td>Обмен между узлами</td><td>Локальная сеть</td></tr><tr><td>8765</td><td>TCP</td><td>Панель и API</td><td>Только <code>127.0.0.1</code> (по умолчанию)</td></tr></table>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Проверка сети: как узел понимает, где обрыв</h2>
+        <div class="in">
+<p>Раз в 10 секунд узел пингует (и пробует TCP 443/80/53) пять целей: шлюз (дом), провайдер, город, страну, мир. Высшая достижимая цель считается «текущей», всё ниже неё — доступным. Первая недоступная выше неё и есть место обрыва. Если интернет есть, сканер ищет узлы редко (раз в 30 минут), при обрыве — каждые две минуты и подробно.</p>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

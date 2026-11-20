@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Узлы — DNet</title>
+<meta name="description" content="Типы узлов DNet — обычный узел, супер-узел, маяк для роутеров, Bluetooth-сосед — и на каком железе они запускались.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html" class=on>Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html">Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Типы узлов</h2>
+        <div class="in">
+          <table>
+            <tr><th>Тип</th><th>Где работает</th><th>Что делает</th></tr>
+            <tr><td><b>Узел</b></td><td>ПК, ноутбук, плата (Python 3.8+)</td><td>Хранит свои страницы, запрашивает чужие по мере надобности. Панель на <code>127.0.0.1:8765</code>.</td></tr>
+            <tr><td><b>Супер-узел</b></td><td>Любая машина с диском побольше</td><td>Каждые 30 с копирует индекс соседей к себе (до 20 страниц за цикл), докачивает из интернета то, что просили другие, пока у него есть выход в мир. Включается <code>super.enabled</code>.</td></tr>
+            <tr><td><b>Маяк <code>dnetd</code></b></td><td>Роутер, мини-плата (C, только libc)</td><td>Отвечает на <code>hello</code> и <code>peers</code>, помнит последних видевшихся (64 записи), шлёт UDP-маяк в подсети роутера. Страниц не хранит. В списках соседей помечен как <span class="pill">роутер</span>.</td></tr>
+            <tr><td><b>Bluetooth-сосед</b></td><td>RFCOMM, MAC в конфиге</td><td>Тот же протокол поверх Bluetooth. <span class="pill dim">экспериментально</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Маяк для роутеров</h2>
+        <div class="in">
+          <p>Роутер включён всегда и стоит между подсетями, поэтому он лучший помощник в обнаружении. <code>dnetd.c</code> — один файл на C без потоков
+          и динамической памяти в коде: отвечает на запросы, ведёт таблицу в RAM и рассылает маяк. Собранный родным gcc на ARM64 весит около 20 КБ.</p>
+          <ul>
+            <li>В таблице 64 записи, не больше 8 с одного адреса; не больше 40 соединений в секунду.</li>
+            <li>Лог <code>dnetd.log</code> лежит рядом с бинарником, не больше 4 КБ (при переполнении начинается заново), сбрасывается при каждом запуске, не чаще 30 строк в минуту — чтобы не изнашивать флеш.</li>
+            <li>Свой путь лога — <code>dnetd -l /tmp/dnetd.log</code> (на OpenWrt корень только для чтения), без лога — <code>dnetd -n</code>.</li>
+            <li>Готовые статические бинарники: <code>mipsel</code>, <code>mips</code>, <code>arm</code>, <code>aarch64</code>, <code>x86</code>, <code>x86_64</code> (кросс-сборка <code>python router/build.py</code>, нужен только zig).</li>
+            <li><code>install.sh</code> сам определяет архитектуру и систему; настройки OpenWrt — в <code>/etc/config/dnetd</code>; есть пакет для SDK. Скрипты автозапуска: OpenWrt (procd), Keenetic (Entware), DD-WRT/Tomato, NetBSD, systemd. Подробнее — <a href="doc-routers.html">документация</a>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>На чём можно запускать</h2>
+        <div class="in">
+          <table>
+            <tr><th>Прошивка / система</th><th class="c">Узел (Python)</th><th class="c">Маяк (C)</th></tr>
+            <tr><td>Windows 10/11</td><td class="c"><span class="pill dark">работает</span></td><td class="c">—</td></tr>
+            <tr><td>Linux (x64, arm64) и macOS (Intel, Apple Silicon)</td><td class="c"><span class="pill">сборки готовы, Linux проверен на ARM64 из исходников, macOS не проверен</span></td><td class="c">—</td></tr>
+            <tr><td>Debian / Ubuntu / Armbian (ARM и x86)</td><td class="c"><span class="pill dark">работает</span></td><td class="c"><span class="pill dark">работает</span></td></tr>
+            <tr><td>OpenWrt (WR741N и др.)</td><td class="c"><span class="pill dim">нужна память под Python</span></td><td class="c"><span class="pill">скрипт есть, не проверен</span></td></tr>
+            <tr><td>Keenetic (Entware), DD-WRT, Tomato</td><td class="c">—</td><td class="c"><span class="pill">скрипт есть, не проверен</span></td></tr>
+            <tr><td>NetBSD</td><td class="c">—</td><td class="c"><span class="pill">код портирован, не проверен</span></td></tr>
+            <tr><td>MikroTik RouterOS 7.5+ (ARM/x86)</td><td class="c">—</td><td class="c"><span class="pill dim">через контейнер, не готово</span></td></tr>
+            <tr><td>Cisco, стоковые прошивки</td><td class="c">—</td><td class="c">запустить нельзя</td></tr>
+          </table>
+          <p class="mut">«Работает» значит проверено на устройстве, а не просто написано. Подробнее — на странице <a href="status.html">«Проверено»</a>.</p>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

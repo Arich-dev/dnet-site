@@ -1,0 +1,17 @@
+# Автозапуск узла DNet (systemd). Проще: dnet --autostart on [--system] сам создаст такой файл.
+# Или вручную, поменяв пользователя и пути:
+#   sudo cp dnet.service /etc/systemd/system/ && sudo systemctl enable --now dnet
+[Unit]
+Description=DNet node
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=linaro
+WorkingDirectory=/home/linaro/dnet
+ExecStart=/usr/bin/python3 /home/linaro/dnet/daemon/main.py --no-ui --debug
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

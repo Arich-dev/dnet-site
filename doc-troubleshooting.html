@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Если что-то не работает — DNet</title>
+<meta name="description" content="Что делать, если узел не запускается, соседи не находятся или страницы не открываются.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Если что-то не работает</h2>
+        <div class="in">
+<p>Сначала откройте окно DNet → вкладка «Журнал» или запустите с <code>--debug</code>: журнал честно говорит, что узел видит и почему отвергает пакеты.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Узел не запускается</h2>
+        <div class="in">
+<p><b>«Не удалось занять порт. Уже запущен другой узел?»</b> — порт 8765, 48555 или 48556 занят. Чаще всего это уже запущенный DNet (значок в трее). Если порт занят другой программой, поменяйте <code>DNET_API_PORT</code> (и адрес в расширении); <code>DNET_UDP_PORT</code> и <code>DNET_TCP_PORT</code> менять нельзя, если хотите видеть остальных (они используют стандартные).</p>
+<p><b>Окно не открывается, пишет про Tk.</b> В Linux поставьте <code>sudo apt install python3-tk</code>. Без окна всегда работают консоль и <code>--no-ui</code>.</p>
+<p><b>Значка в трее нет.</b> В Windows проверьте скрытые значки (стрелка <code>^</code> рядом с часами) и перетащите значок на панель. В Linux нужны <code>pip install pystray pillow</code>. В macOS значка нет.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Соседи не находятся</h2>
+        <div class="in">
+<ol><li><b>Брандмауэр.</b> Разрешите UDP 48555 и TCP 48556 для частной сети. Команды — в <a href="doc-install.html">INSTALL.md</a>. Классический признак: вы видите соседа, а он вас — нет (или наоборот).</li><li><b>Разные подсети / гостевая сеть / изоляция клиентов Wi-Fi.</b> Маяк работает только в пределах одной подсети; точки доступа с включённой «изоляцией клиентов» блокируют обмен. Добавьте соседа вручную: «Настройки → Соседи вручную» (<code>192.168.1.20</code> или <code>…:порт</code>).</li><li><b>Разные сети (дом ↔ дача).</b> Через интернет без белого адреса узлы не найдут друг друга; нужен проброс порта TCP 48556 и <code>static_peers</code> с внешним адресом.</li><li><b>VPN.</b> Если трафик локальной сети уходит в VPN, соседи пропадут. Отключите VPN или исключите локальную подсеть.</li><li>Проверка вручную: <code>Test-NetConnection 192.168.1.20 -Port 48556</code> (PowerShell) — должно быть <code>True</code>.</li></ol>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Страницы не сохраняются</h2>
+        <div class="in">
+<ul><li>Расширение выключено (бейдж <code>OFF</code> на значке) или узел не запущен — в окне расширения узел должен быть «работает».</li><li>Страница не из публичной сети или попала под правило приватности: поиск, адреса с <code>?…</code>, почта, вход, кабинеты, корзина, инкогнито. Это сделано специально.</li><li>Адрес узла в расширении не совпадает с реальным портом («Адрес узла» в окне расширения).</li><li>Расширение сохраняет страницу не чаще чем раз в 12 часов.</li></ul>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Страница не открывается при обрыве</h2>
+        <div class="in">
+<ul><li>Копии нет ни у вас, ни у соседей (узел пишет об этом в журнале: <code>page … MISS</code>).</li><li>Расширение подменяет только <b>ошибки сети</b> (нет интернета, DNS, таймаут, отказ соединения). Если сайт ответил любой страницей, в том числе ошибкой 500, подмены нет.</li><li>Узел должен быть запущен до обрыва: после обрыва расширение уже не сможет его разбудить.</li></ul>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Расширение</h2>
+        <div class="in">
+<p><b>Firefox: «Расширение не может быть проверено».</b> Обычный Firefox не принимает неподписанные расширения. Используйте «Загрузить временное дополнение» (<code>about:debugging</code>), либо Developer Edition / Nightly.</p>
+<p><b>Chrome отключает расширение после перезапуска</b> (из-за режима разработчика). Нажмите «Оставить» в предупреждении или установите его заново; для постоянной работы без предупреждения расширение нужно публиковать в магазине, это в планах.</p>
+<p><b>Вкладка с копией пустая.</b> Копия сохранена как есть: только HTML, без картинок, CSS и скриптов. Это ограничение выбрано ради малого размера кэша и безопасности.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Windows</h2>
+        <div class="in">
+<p><b>SmartScreen / антивирус ругается на exe.</b> Сборки не подписаны. Сравните SHA-256 с указанным на странице «Скачать» или соберите сами (<code>python packaging/build_windows.py</code>).</p>
+<p><b>Автозапуск не работает.</b> Проверьте: <code>DNet.exe --autostart status</code>. Если автозапуск включён, но программа не стартует, посмотрите, не отключил ли её «Диспетчер задач → Автозагрузка» (там она числится как «DNet»).</p>
+<p><b>Как удалить полностью.</b> «Параметры → Приложения → DNet → Удалить», при удалении отметьте очистку данных; для портативной версии просто удалите папку.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Роутер</h2>
+        <div class="in">
+<p>См. раздел «Как проверить» в <a href="doc-routers.html">ROUTERS.md</a>. Если на роутере <code>dnetd: not found</code> или <code>Exec format error</code>, взят бинарник не под ту архитектуру (<code>mips</code> ↔ <code>mipsel</code> — частая путаница; <code>install.sh</code> определяет сам).</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Сообщить об ошибке</h2>
+        <div class="in">
+<p>Приложите версию (<code>DNet --version</code>), систему, последние строки журнала (<code>~/.dnet/debug.log</code> при <code>--debug</code>) и что вы делали.</p>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

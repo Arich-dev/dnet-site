@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Протокол и API — DNet</title>
+<meta name="description" content="Формат обмена между узлами DNet (UDP-маяк, TCP-операции hello, peers, index, get, want) и HTTP API узла для расширения и панели.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html" class=on>Протокол</a><a href="install.html">Установка</a><a href="docs.html">Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Обмен между узлами</h2>
+        <div class="in">
+          <table>
+            <tr><th>Порт</th><th>Транспорт</th><th>Назначение</th></tr>
+            <tr><td><code>UDP 48555</code></td><td>один JSON-пакет</td><td>Маяк «я здесь»: <code>{"dnet": 1, "id": "…"}</code>. Получатель отвечает по TCP.</td></tr>
+            <tr><td><code>TCP 48556</code></td><td>одна JSON-строка запроса на соединение</td><td>Ответ — строка заголовка и, если есть тело, столько байт, сколько указано в <code>len</code>.</td></tr>
+          </table>
+          <p>Лимиты: строка запроса и заголовка — до 1 МБ, страница — до 20 МБ. На одно TCP-соединение приходится один запрос.</p>
+
+          <h3>Операции</h3>
+          <table>
+            <tr><th>Запрос</th><th>Ответ</th></tr>
+            <tr><td><code>{"op": "hello", "id", "nick", "sup", "port", "v": 1}</code></td><td>то же самое про отвечающего; у маяка добавлено <code>"kind": "router"</code>. Отправитель регистрируется у получателя.</td></tr>
+            <tr><td><code>{"op": "peers"}</code></td><td><code>{"peers": [["10.0.0.5", 48556], …]}</code> — до 20 адресов известных соседей.</td></tr>
+            <tr><td><code>{"op": "index"}</code></td><td><code>{"items": [[ключ, адрес, время, размер], …]}</code> — последние сохранённые страницы (не больше 150).</td></tr>
+            <tr><td><code>{"op": "get", "key": "…"}</code></td><td><code>{"ok": true, "url", "ctype", "saved", "len": N}</code> и N байт HTML; если страницы нет — <code>{"ok": false}</code>.</td></tr>
+            <tr><td><code>{"op": "want", "url": "…"}</code></td><td><code>{"ok": true}</code>; супер-узел ставит адрес в очередь на скачивание из интернета.</td></tr>
+          </table>
+
+          <h3>Что проверяет получатель</h3>
+          <ul>
+            <li>В <code>hello</code>: <code>id</code> — 8–64 символа hex, <code>port</code> — целое 1–65535, <code>nick</code> — строка (обрезается до 32 символов), <code>sup</code> — булево.</li>
+            <li>В <code>get</code>: тип <code>text/html</code>, непустое тело, SHA-256 адреса совпадает с запрошенным ключом, адрес не попадает под <a href="privacy.html">правила приватности</a>.</li>
+            <li>В <code>index</code>: ключ — 64 символа hex и действительно равен хэшу адреса; приватные адреса отбрасываются.</li>
+          </ul>
+          <div class="note">Подписей и шифрования между узлами нет: узел проверяет формат, но не личность соседа. Подробнее — в разделе <a href="privacy.html">«Безопасность»</a>.</div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>HTTP API узла</h2>
+        <div class="in">
+          <p>Слушает <code>127.0.0.1:8765</code> (параметр <code>api_bind</code> в конфиге меняет адрес). Им пользуются расширение и панель.</p>
+          <table>
+            <tr><th>Запрос</th><th>Что делает</th></tr>
+            <tr><td><code>GET /</code></td><td>Панель управления (HTML).</td></tr>
+            <tr><td><code>GET /status</code></td><td>JSON: id, ник, число страниц и размер, уровни сети, соседи (адрес, прыжки, тип, супер-узел), найденные подсети, режим сканера.</td></tr>
+            <tr><td><code>GET /pages</code></td><td>JSON: свои страницы и те, что есть только у соседей (<code>remote: true</code>).</td></tr>
+            <tr><td><code>GET /has?url=…</code></td><td>Когда страница сохранена у этого узла (или <code>null</code>). Адрес — в URL-кодировке.</td></tr>
+            <tr><td><code>GET /page?url=…</code></td><td>Копия страницы: с этого узла или, если нет, у соседей. 404, если нигде не нашлась.</td></tr>
+            <tr><td><code>POST /save</code></td><td>Сохранить страницу (заголовки <code>X-Url</code>, <code>X-Ctype</code>, тело — HTML). Только с локального адреса и от расширения Chrome.</td></tr>
+            <tr><td><code>POST /clear</code></td><td>Очистить кэш. Только с локального адреса и со своей панели (проверяется <code>Origin</code>).</td></tr>
+          </table>
+          <p class="mut">Страницы отдаются с заголовком <code>Content-Security-Policy: sandbox</code>, поэтому скрипты в сохранённых копиях не выполняются.</p>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Пример: посмотреть на всё руками</h2>
+        <div class="in">
+<pre data-copy>curl -s http://127.0.0.1:8765/status
+curl -s http://127.0.0.1:8765/pages
+# у кого-то из соседей спросить индекс напрямую:
+printf '{"op": "index"}\n' | nc 192.168.1.10 48556</pre>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Устройство и протокол — DNet</title>
+<meta name="description" content="Из каких частей состоит DNet, как узлы находят друг друга, протокол и HTTP API.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Части</h2>
+        <div class="in">
+<pre data-copy> ┌────────────────┐   HTTP 127.0.0.1:8765    ┌──────────────────────────────┐
+ │ Расширение     │ ───────────────────────▶ │ Узел (daemon/)               │
+ │ Chrome/Firefox │  /save /has /page        │  api.py    панель и HTTP API │
+ └────────────────┘                          │  store.py  кэш (SQLite)      │
+                                             │  p2p.py    обмен с соседями  │
+ ┌────────────────┐   UDP 48555 / TCP 48556  │  netcheck  монитор 5 уровней │
+ │ Другие узлы и  │ ◀──────────────────────▶ │  probe.py  сканер подсетей   │
+ │ роутеры dnetd  │                          │  supernode большой кэш       │
+ └────────────────┘                          │  gui/tui/tray  интерфейсы    │
+                                             └──────────────────────────────┘</pre>
+<table><tr><th>Файл</th><th>Роль</th></tr><tr><td><code>daemon/main.py</code></td><td>Запуск, конфиг, выбор интерфейса, переносной режим, единственный экземпляр</td></tr><tr><td><code>daemon/api.py</code></td><td>Панель <code>/</code> и HTTP API</td></tr><tr><td><code>daemon/store.py</code></td><td>Кэш страниц в SQLite, сжатие zlib, срок и лимит</td></tr><tr><td><code>daemon/p2p.py</code></td><td>Таблица соседей, маяк, обмен страницами</td></tr><tr><td><code>daemon/netcheck.py</code></td><td>Монитор «дом → мир», пинг, трассировка</td></tr><tr><td><code>daemon/probe.py</code></td><td>Сканер локальных и публичных подсетей</td></tr><tr><td><code>daemon/supernode.py</code></td><td>Репликация и докачка</td></tr><tr><td><code>daemon/policy.py</code></td><td>Что нельзя сохранять и отдавать</td></tr><tr><td><code>daemon/bt.py</code></td><td>Bluetooth RFCOMM (по желанию)</td></tr><tr><td><code>daemon/gui.py</code>, <code>tray.py</code>, <code>icon.py</code></td><td>Окно, трей, мини-окно, значки</td></tr><tr><td><code>daemon/tui.py</code></td><td>Консольный интерфейс</td></tr><tr><td><code>daemon/service.py</code></td><td>Автозапуск</td></tr><tr><td><code>router/dnetd.c</code></td><td>Маяк для роутеров</td></tr><tr><td><code>extension/</code>, <code>extension-firefox/</code></td><td>Расширения</td></tr></table>
+<p>Узел написан на Python 3.8+ без внешних зависимостей, только стандартная библиотека. Расширение и узел общаются по loopback; наружу узел слушает только 48555/48556.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Как соседи находят друг друга</h2>
+        <div class="in">
+<ol><li><b>Маяк.</b> Каждые 15 секунд узел шлёт UDP-пакет <code>{"dnet":1,"id":"…"}</code> на <code>255.255.255.255</code> и широковещательный адрес своей /24 (порт 48555).</li><li>Получив маяк незнакомого узла, узел отвечает ему TCP-запросом <code>hello</code>.</li><li><b>Синхронизация раз в 20 секунд</b>: у каждого соседа спрашиваются <code>hello</code> (подтвердить, что жив), <code>index</code> (какие страницы есть) и <code>peers</code> (с кем он знаком — до пяти новых адресов проверяются сразу).</li><li>Дополнительно: <code>static_peers</code> из конфига, сканер подсетей (<code>probe.py</code>), Bluetooth.</li><li>Сосед считается живым, пока не прошёл <code>ttl</code> после последней встречи (300 с для найденных по сети, 120 с — для найденных сканером или вручную).</li></ol>
+<p>«Прыжки» считаются по TTL ответа на ping: сколько маршрутизаторов между вами.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Как открывается страница при обрыве</h2>
+        <div class="in">
+<ol><li>Браузер: ошибка сети (<code>ERR_NAME_NOT_RESOLVED</code>, <code>NS_ERROR_UNKNOWN_HOST</code> и т. п.).</li><li>Расширение проверяет <code>GET /page?url=…</code>. Если ответ 200, вкладка переходит на эту копию.</li><li>Узел ищет страницу у себя; если нет — спрашивает соседей: сначала того, чей индекс её содержал, потом ближайших, всего до шести. Найденное сохраняет у себя.</li><li>Если не нашёл нигде, а включён режим супер-узла (у него или у соседей), запрос запоминается («want»), и супер-узел докачает страницу, когда появится интернет.</li></ol>
+<p>Копия открывается в песочнице (<code>Content-Security-Policy: sandbox</code>), скрипты на ней не выполняются.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Протокол между узлами</h2>
+        <div class="in">
+<p><b>UDP 48555.</b> Маяк: <code>{"dnet": 1, "id": "&lt;hex 8..64&gt;"}</code>, пакет до 512 байт.</p>
+<p><b>TCP 48556.</b> Один запрос на соединение. Запрос — одна строка JSON, оканчивающаяся <code>\n</code>. Ответ — строка JSON с заголовком; если есть <code>"len": N</code>, дальше идёт ровно N байт тела.</p>
+<table><tr><th>Запрос</th><th>Ответ</th></tr><tr><td><code>{"op":"hello","id","nick","sup","port","v":1}</code></td><td>то же самое о ответившем узле; у роутера ещё <code>"kind":"router"</code></td></tr><tr><td><code>{"op":"index"}</code></td><td><code>{"items":[[key,url,saved,size],…]}</code> — до 150 свежих страниц, без запрещённых политикой</td></tr><tr><td><code>{"op":"peers"}</code></td><td><code>{"peers":[[ip,port],…]}</code> — до 20 известных соседей (без Bluetooth)</td></tr><tr><td><code>{"op":"get","key":"&lt;sha256 url&gt;"}</code></td><td><code>{"ok":true,"url","ctype","saved","len":N}</code> + тело, либо <code>{"ok":false}</code></td></tr><tr><td><code>{"op":"want","url":"…"}</code></td><td><code>{"ok":true}</code>; супер-узел запоминает адрес</td></tr></table>
+<p><code>key</code> — SHA-256 от адреса страницы без <code>#фрагмента</code>. Принимающий узел проверяет всё: формат <code>id</code>, тип содержимого (только <code>text/html</code>), что <code>key</code> действительно соответствует <code>url</code>, что адрес не запрещён политикой, размер (строка до 1 МБ, тело до 20 МБ).</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>HTTP API узла</h2>
+        <div class="in">
+<p>Базовый адрес <code>http://127.0.0.1:8765</code>.</p>
+<table><tr><th>Запрос</th><th>Описание</th></tr><tr><td><code>GET /</code></td><td>Панель</td></tr><tr><td><code>GET /status</code></td><td>JSON: <code>id</code>, <code>nick</code>, <code>pages</code>, <code>bytes</code>, <code>net</code> (уровни), <code>super</code>, <code>scanner</code>, <code>bluetooth</code>, <code>nets</code>, <code>peers</code></td></tr><tr><td><code>GET /pages</code></td><td>Список страниц: свои и те, что только у соседей</td></tr><tr><td><code>GET /has?url=</code></td><td><code>{"saved": &lt;время или null&gt;}</code></td></tr><tr><td><code>GET /page?url=</code></td><td>Копия страницы (с жёлтой плашкой) или 404</td></tr><tr><td><code>POST /save</code></td><td>Сохранить страницу: тело — HTML, заголовки <code>X-Url</code>, <code>X-Ctype</code>. Только от расширения (<code>Origin: chrome-extension://…</code> или <code>moz-extension://…</code>) и только с этого компьютера</td></tr><tr><td><code>POST /clear</code></td><td>Очистить кэш. Только с панели узла (<code>Origin</code> = адрес самой панели) и только с этого компьютера</td></tr></table>
+<p>Остальное, что открыто с других компьютеров при <code>api_bind=0.0.0.0</code>, — только чтение.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Маяк роутера</h2>
+        <div class="in">
+<p><code>dnetd.c</code> честно отвечает на все запросы протокола, но страниц у него нет: <code>hello</code> (с <code>"kind":"router"</code>) и <code>peers</code> — по существу, <code>index</code> — пустым списком, <code>get</code> — <code>{"ok":false}</code>, <code>want</code> — <code>{"ok":true}</code> без последствий, остальное — <code>{"error":"bad op"}</code>. Таблица соседей — в RAM (64 записи, не больше 8 с одного адреса), не больше 40 соединений в секунду. Полноценные узлы не просят у роутеров страницы (<code>kind</code> = router).</p>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Использование — DNet</title>
+<meta name="description" content="Окно, значок в трее, мини-окно, консольный интерфейс и режимы запуска.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Запуск и режимы</h2>
+        <div class="in">
+<table><tr><th>Команда</th><th>Что открывается</th></tr><tr><td><code>DNet.exe</code> / ярлык «DNet»</td><td>Окно + значок в трее (Windows). Если узел уже запущен — просто откроется его панель в браузере</td></tr><tr><td><code>DNet.exe --tray</code></td><td>Сразу в трей, без окна (так запускается автозапуск)</td></tr><tr><td><code>python daemon/main.py --gui</code></td><td>Окно из исходников</td></tr><tr><td><code>dnet-cli.exe</code>, <code>python daemon/main.py</code></td><td>Консольный интерфейс с вкладками и цветами (если запущено в терминале)</td></tr><tr><td><code>--no-ui</code></td><td>Совсем без интерфейса: для службы, платы, сервера</td></tr><tr><td><code>--debug</code></td><td>Отдельное окно с подробным логом (также пишется в <code>~/.dnet/debug.log</code>)</td></tr><tr><td><code>--autostart on|off|status</code></td><td>Автозапуск, см. <a href="doc-install.html">INSTALL.md</a></td></tr><tr><td><code>--version</code></td><td>Версия</td></tr></table>
+<p>Панель в браузере всегда доступна по адресу <b>http://127.0.0.1:8765/</b>.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Окно</h2>
+        <div class="in">
+<p>Пять вкладок:</p>
+<ul><li><b>Сеть</b> — цепочка «Дом → Провайдер → Город → Страна → Мир». Зелёная точка — уровень доступен, красная — обрыв, серая — не проверено. Рядом режим сканера, число соседей и страниц, найденные подсети.</li><li><b>Соседи</b> — кого узел видит: имя, адрес, число прыжков, тип (узел / супер-узел / роутер), канал (сеть или Bluetooth), когда виден последний раз.</li><li><b>Файлы</b> — сохранённые страницы и те, что есть только у соседей. Двойной клик (или Enter) открывает страницу из кэша или у соседа. Поиск по адресу, кнопка «Очистить кэш…».</li><li><b>Настройки</b> — имя, срок хранения, лимиты кэша, сканер, супер-узел, соседи вручную, Bluetooth, проверяемые хосты, автозапуск, доступ к панели с других компьютеров. Кнопка «Сохранить» применяет значения сразу; исключения (Bluetooth, доступ из сети) отмечены «нужен перезапуск».</li><li><b>Журнал</b> — последние события узла: новые соседи, ошибки, смена состояния сети.</li></ul>
+<p>Крестик закрывает окно в трей, а не выходит из программы. Выйти — кнопка «Выход» или пункт меню трея.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Значок в трее</h2>
+        <div class="in">
+<p>Цвет значка показывает состояние сети:</p>
+<table><tr><th>Цвет</th><th>Значение</th></tr><tr><td>Зелёный</td><td>Интернет есть</td></tr><tr><td>Жёлтый</td><td>Частичный обрыв: связь есть не до самого «Мира»</td></tr><tr><td>Красный</td><td>Нет связи даже с роутером</td></tr><tr><td>Серый</td><td>Идёт первая проверка</td></tr></table>
+<p>Подсказка при наведении показывает состояние и число соседей.</p>
+<ul><li><b>Левый клик</b> — мини-окно: состояние, цепочка уровней, число соседей и страниц, кнопки «Открыть окно», «Панель в браузере», переключатель супер-узла и «Выход». Закрывается кликом в стороне или Esc.</li><li><b>Двойной клик</b> — главное окно.</li><li><b>Правый клик</b> — меню: открыть окно, панель, автозапуск, выход.</li></ul>
+<p>Значок в трее есть в Windows (всегда) и в Linux при установленном <code>pystray</code>. В macOS работают окно и консоль.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Консольный интерфейс</h2>
+        <div class="in">
+<p>Вкладки: Сеть, Соседи, Файлы, Настройки, Журнал. Клавиши: <code>←</code> <code>→</code> / <code>Tab</code> / <code>1</code>–<code>5</code> — вкладки, <code>↑</code> <code>↓</code> <code>PgUp</code> <code>PgDn</code> — прокрутка, <code>Enter</code> — переключить настройку, <code>x</code> — очистить кэш (с подтверждением), <code>q</code> — выход. Цвета отключаются переменной <code>NO_COLOR</code>.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Как это выглядит в работе</h2>
+        <div class="in">
+<ol><li>Вы читаете сайты обычным образом, расширение сохраняет их публичную версию на узел.</li><li>Узлы в одной сети находят друг друга сами (UDP-маяк), обмениваются списками страниц и рассказывают о своих соседях.</li><li>Пропал интернет → браузер показывает ошибку → расширение замечает её и открывает копию страницы с вашего узла или у соседа. Вверху копии жёлтая плашка «Копия из сети DNet от …».</li><li>Когда интернет вернулся, страницы снова открываются как обычно, а узел продолжает сохранять новые.</li></ol>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Что не сохраняется</h2>
+        <div class="in">
+<p>Страницы поисковиков, любые адреса с параметрами (<code>?…</code>), почта, кабинеты, вход, корзина и оплата, локальные адреса, инкогнито. Правило действует и в расширении, и на самом узле (он отклоняет такие страницы, вычищает их из кэша при старте и не отдаёт соседям). Подробнее — <a href="doc-security.html">SECURITY.md</a>.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Супер-узел</h2>
+        <div class="in">
+<p>Включите «Супер-узел» на компьютере, который почти всегда в сети (и лучше с хорошим каналом). Он держит большой кэш (по умолчанию 2 ГБ), копирует индексы соседей, а когда у него есть выход в интернет — докачивает страницы, которые у других не нашлись.</p>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

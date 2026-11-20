@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Роутеры — DNet</title>
+<meta name="description" content="Маяк dnetd: бинарники под MIPS, ARM, AArch64 и x86, установка на OpenWrt, Keenetic, DD-WRT.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Роутеры</h2>
+        <div class="in">
+<p><code>dnetd</code> — крошечная программа на C (только libc, без потоков и динамической памяти). Она делает роутер заметным для сети DNet:</p>
+<ul><li>отвечает соседям на <code>hello</code> и <code>peers</code> (TCP 48556);</li><li>запоминает, кто к нему заходил (таблица только в RAM, до 64 записей);</li><li>рассылает UDP-маяк (порт 48555) в подсети роутера;</li><li>страниц <b>не хранит</b>. В списке соседей отображается как <code>РОУТЕР</code>.</li></ul>
+<p>Нужна она, когда компьютеры дома не всегда включены одновременно: роутер включён всегда и подсказывает новым узлам, кто есть рядом. Бинарник весит 40–85 КБ, так что подходит даже для устройств с 4 МБ флеша.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Быстрая установка</h2>
+        <div class="in">
+<p>Готовые статические бинарники лежат в <code>dist/router/</code> (или в архиве <code>dnet-0.3-router.zip</code> на странице «Скачать»):</p>
+<table><tr><th>Файл</th><th>Процессоры</th></tr><tr><td><code>dnetd-mipsel</code></td><td>MediaTek/Ralink/Atheros little-endian (MT7620/21/28, TP-Link WR741N и многие другие)</td></tr><tr><td><code>dnetd-mips</code></td><td>Atheros/QCA big-endian (AR71xx, ath79)</td></tr><tr><td><code>dnetd-arm</code></td><td>ARMv5–v7 (IPQ40xx, Marvell, Keenetic на ARM)</td></tr><tr><td><code>dnetd-aarch64</code></td><td>64-бит ARM (MT7622/7981, RPi, Filogic)</td></tr><tr><td><code>dnetd-x86</code>, <code>dnetd-x86_64</code></td><td>x86-роутеры, мини-ПК, виртуалки</td></tr></table>
+<p>Скопируйте папку <code>router/</code> на роутер и запустите скрипт — он сам определит архитектуру и систему:</p>
+<pre data-copy>scp -r router root@192.168.1.1:/tmp/dnet      # бинарники dnetd-* положите в эту же папку
+ssh root@192.168.1.1 'sh /tmp/dnet/install.sh'</pre>
+<p>Удаление: <code>sh install.sh --remove</code>. Не знаете архитектуру: <code>ssh root@роутер uname -m</code> (для OpenWrt точнее <code>cat /etc/openwrt_release</code>; mips / mipsel различает сам скрипт).</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>По системам</h2>
+        <div class="in">
+<h3>OpenWrt</h3>
+<p><code>install.sh</code> кладёт бинарник в <code>/usr/bin/dnetd</code>, службу procd — в <code>/etc/init.d/dnetd</code>, настройки — в <code>/etc/config/dnetd</code>:</p>
+<pre data-copy>config dnetd 'main'
+	option enabled '1'
+	option log '/tmp/dnetd.log'    # лог в RAM; пусто — без лога</pre>
+<p>Управление: <code>/etc/init.d/dnetd start|stop|restart|enable|disable</code>. Корень OpenWrt доступен только для чтения, поэтому лог по умолчанию пишется в <code>/tmp</code>.</p>
+<p>Вручную (если скрипт не нужен): <code>scp dnetd-mipsel root@192.168.1.1:/usr/bin/dnetd</code>, скопировать <code>router/openwrt/dnetd.init</code> в <code>/etc/init.d/dnetd</code>, <code>chmod +x</code>, <code>/etc/init.d/dnetd enable &amp;&amp; /etc/init.d/dnetd start</code>.</p>
+<p><b>Собственный пакет.</b> В <code>router/openwrt/package/dnetd</code> лежит описание пакета для SDK или buildroot (<code>make package/dnetd/compile</code>, подробности — в начале его <code>Makefile</code>). Тогда <code>dnetd</code> ставится как обычный <code>opkg</code>-пакет и попадает в прошивку.</p>
+<p><b>Фаервол.</b> Порты лежат в зоне <code>lan</code>, а она по умолчанию принимает входящие, так что ничего открывать не нужно. Не открывайте 48555/48556 в сторону WAN.</p>
+<h3>Keenetic (Entware), Padavan</h3>
+<p>Нужен Entware (<code>/opt</code>). <code>install.sh</code> положит бинарник в <code>/opt/bin/dnetd</code> и скрипт <code>S99dnetd</code> в <code>/opt/etc/init.d</code>. Управление: <code>/opt/etc/init.d/S99dnetd start|stop|restart|status</code>.</p>
+<h3>DD-WRT</h3>
+<ol><li>Включите JFFS (Administration → Management → JFFS2) или подключите USB-флешку.</li><li>Скопируйте нужный <code>dnetd-&lt;арх&gt;</code> как <code>/jffs/dnetd</code> и <code>chmod +x</code>.</li><li>Содержимое <code>router/ddwrt/startup.sh</code> вставьте в Administration → Commands → «Save Startup». Скрипт перезапускает маяк, если тот упал.</li></ol>
+<h3>NetBSD, FreeBSD и другие</h3>
+<p>Соберите <code>dnetd</code> на самой системе (<code>cd router &amp;&amp; make</code>), положите в <code>/usr/local/sbin/dnetd</code>, скрипт <code>router/netbsd/dnetd.rc</code> — в <code>/etc/rc.d/dnetd</code>, в <code>/etc/rc.conf</code> добавьте <code>dnetd=YES</code>.</p>
+<h3>Обычный Linux, Raspberry Pi</h3>
+<p><code>install.sh</code> создаст службу systemd <code>dnetd</code>. Но на плате с Linux лучше ставить полноценный узел, а не маяк (см. <a href="doc-install.html">INSTALL.md</a>).</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Параметры</h2>
+        <div class="in">
+<pre data-copy>dnetd [-l файл_лога] [-n]
+  -l  путь к логу (по умолчанию dnetd.log рядом с бинарником)
+  -n  без лога</pre>
+<p>Лог не больше 4 КБ (при переполнении начинается заново), сбрасывается при каждом запуске, пишется не чаще 30 строк в минуту — флеш не изнашивается.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Сборка</h2>
+        <div class="in">
+<pre data-copy>pip install ziglang            # один кросс-компилятор на все архитектуры, SDK не нужен
+python router/build.py         # -&gt; dist/router/dnetd-&lt;арх&gt; и SHA256SUMS
+
+cd router &amp;&amp; make              # или обычным компилятором на этой машине
+make CC=mipsel-openwrt-linux-musl-gcc     # тулчейном OpenWrt SDK</pre>
+<p>Сборка статическая (musl), поэтому один бинарник работает на любой прошивке с этой архитектурой, независимо от версии libc.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Как проверить</h2>
+        <div class="in">
+<ol><li>На роутере: <code>ps | grep dnetd</code>, <code>cat /tmp/dnetd.log</code>.</li><li>На компьютере с DNet: вкладка «Соседи» — роутер появится в течение полуминуты с типом «роутер».</li><li>Вручную: <code>nc -w 2 192.168.1.1 48556</code> и введите <code>{"op":"hello"}</code> — вернётся JSON с <code>"kind":"router"</code>.</li></ol>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

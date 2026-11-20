@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Страницы, которые не пропадают вместе с интернетом — DNet</title>
+<meta name="description" content="DNet — расширение для Chrome и Firefox и узлы на Python и C, которые находят друг друга сами и обмениваются сохранёнными страницами, когда интернет сломан.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.3</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html" class=on>Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html">Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Что это</h2>
+        <div class="in">
+          <p class="lead"><b>DNet</b> — расширение для Chrome или Firefox плюс небольшая программа-узел с окном и значком в трее. Расширение сохраняет страницы, которые ты открываешь.
+          Узлы в одной сети находят друг друга сами, без сервера, и обмениваются копиями. Когда интернет пропал — полностью или частично
+          (нет города, страны, мира) — страница открывается из твоего кэша или с соседнего узла.</p>
+          <p>Схема навеяна старым устройством Skype: обычные узлы, супер-узлы, поиск соседей без центрального сервера. Отличие в том, что DNet
+          сам сканирует подсети и знает, <i>докуда сейчас доходит</i> связь — дом, провайдер, город, страна или мир.</p>
+          <div class="btns">
+            <a class="btn big" href="install.html">Установить за 5 минут</a>
+            <a class="btn big" href="how.html">Как это работает</a>
+            <a class="btn big" href="download.html">Скачать</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Панель узла</h2>
+        <div class="in">
+          <figure>
+            <img src="img/panel.jpg" width="785" height="600" alt="Панель узла DNet: уровни сети, соседи, подсети и список страниц">
+            <figcaption>Настоящий скриншот панели (<code>http://127.0.0.1:8765/</code>): уровни сети, соседи, кэш и страницы, в том числе те, что есть только у соседей.</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Что умеет</h2>
+        <div class="in">
+          <div class="grid3">
+            <div class="cell"><b>Сохраняет страницы</b>Публичная версия HTML без cookies. Поиск, почта, кабинеты и адреса с параметрами не сохраняются.</div>
+            <div class="cell"><b>Находит соседей сам</b>UDP-маяк, списки соседей, статические адреса, сканер подсетей, Bluetooth.</div>
+            <div class="cell"><b>Знает, где обрыв</b>Каждые 10 секунд проверяет дом, провайдера, город, страну и мир.</div>
+            <div class="cell"><b>Открывает копию</b>При ошибке сети расширение подменяет вкладку копией с жёлтой плашкой «Копия из сети DNet».</div>
+            <div class="cell"><b>Супер-узлы</b>Копируют страницы соседей и докачивают то, что просили другие, пока есть выход в интернет.</div>
+            <div class="cell"><b>Окно и трей</b>Окно с вкладками, значок цвета «интернет есть / обрыв» и мини-окно по клику; консольный интерфейс остался.</div>
+            <div class="cell"><b>Работает на роутерах</b>Маяк <code>dnetd</code> на C: 40–85 КБ, готовые бинарники под MIPS, ARM, AArch64 и x86, установка одной командой.</div>
+            <div class="cell"><b>Без прав администратора</b>Установщик в профиль пользователя, переносная версия, автозапуск без службы.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Попробовать</h2>
+        <div class="in">
+          <ol class="steps">
+            <li><a href="download.html">Скачай</a> установщик (Windows) или переносную версию — Python не нужен. На Linux и macOS — архив или <code>.pyz</code>.</li>
+            <li>Запусти DNet: в трее появится значок, клик по нему покажет состояние сети.</li>
+            <li>Загрузи расширение: <code>chrome://extensions</code> → режим разработчика → папка <code>extension</code> (Firefox — <code>extension-firefox</code>).</li>
+            <li>Открой любую статью, потом вкладку «Файлы» в окне DNet — страница уже в кэше.</li>
+            <li>Нет второго компьютера? <code>demo_two_nodes.bat</code> запустит два настоящих узла на одном ПК, и страницы будут переходить между ними.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Честно о состоянии</h2>
+        <div class="in">
+          <p>Проект учебный. Проверено на Windows 10 (узел, окно, трей, установщик, переносная версия) и на плате DragonBoard 410c (Debian, ARM64): узлы находят друг друга, страница передаётся
+          за доли секунды, супер-узел зеркалит новые страницы за ~20 секунд. Часть заявленного пока только написана и не проверена на железе
+          (роутеры под OpenWrt, Bluetooth, MikroTik, Firefox, Linux и macOS-версии). Подробный список — на странице <a href="status.html">«Проверено»</a>.</p>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.3-Setup.exe">Установщик Windows<br><small>33.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.3-portable.zip">Переносная версия<br><small>23.8 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.3-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.3 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
