@@ -18,7 +18,7 @@
       <h1>DNet</h1>
       <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
     </div>
-    <div class="ver">версия <b>0.4</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+    <div class="ver">версия <b>0.5</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
   </div>
 
   <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html">Документация</a><a href="privacy.html">Безопасность</a><a href="status.html" class=on>Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
@@ -50,6 +50,7 @@
             <tr><td>Бинарники <code>dnetd</code> под MIPS, ARM, AArch64, x86</td><td class="c"><span class="pill">собраны, не запускались</span></td><td>Кросс-сборка через zig без предупреждений; формат файлов проверен, но на реальных роутерах запуска ещё не было. Главный тест — TP-Link WR741N (OpenWrt, MIPS).</td></tr>
             <tr><td>Расширение для Firefox</td><td class="c"><span class="pill">написано, не проверено</span></td><td>Общий код с Chrome, манифест Manifest V2. В самом Firefox пока не загружалось.</td></tr>
             <tr><td>Бинарники Linux и macOS</td><td class="c"><span class="pill dim">через CI</span></td><td>Собираются на GitHub Actions и командой <code>packaging/build_unix.py</code>; в Linux и macOS не запускались. Версия <code>.pyz</code> запущена на Windows.</td></tr>
+            <tr><td>NAT: UPnP, ретранслятор, пробивка, реестр (стенд из виртуалок OpenWrt)</td><td class="c"><span class="pill dark">работает</span></td><td>Два NAT-роутера (один с miniupnpd), публичный узел с реестром. Не проверено на домашних роутерах и у провайдеров с CGNAT.</td></tr>
             <tr><td>Роутер TP-Link WR741N (OpenWrt, MIPS)</td><td class="c"><span class="pill dim">в планах</span></td><td>Главный тест маяка на 4 МБ флеша.</td></tr>
             <tr><td>Автозапуск: OpenWrt, Keenetic, DD-WRT, NetBSD</td><td class="c"><span class="pill dim">не проверено</span></td><td>Скрипты написаны, на реальных роутерах не запускались.</td></tr>
             <tr><td>Bluetooth RFCOMM</td><td class="c"><span class="pill dim">не проверено</span></td><td>Код есть, на устройствах не пробовался.</td></tr>
@@ -92,6 +93,7 @@
         <h2>Журнал изменений</h2>
         <div class="in">
           <ul>
+            <li><b>0.5</b> — узлы за NAT: автопроброс порта (UPnP, NAT-PMP), ретранслятор и пробивка NAT; сеть через интернет: реестр супернод и вход к самой крупной; проверено на стенде из виртуалок OpenWrt (UPnP, ретрансляция, пробивка, симметричный NAT); окно показывает статус NAT и реестра; лаборатория в tools/lab.</li>
             <li><b>0.4</b> — провайдер и город определяются по трассировке, резерв частых страниц между узлами, поддержка Kiwix (Википедия без интернета, в том числе через соседей), раздача DNet соседям и экспорт на флешку, необязательный список начальных адресов; документация по поиску узлов, Kiwix и распространению.</li>
             <li><b>0.3</b> — окно с вкладками и значок в трее с мини-окном, автозапуск без прав администратора (Windows, Linux, macOS), расширение для Firefox и переработанное для Chrome (настраиваемый адрес узла, значки, проверка копии перед подменой), готовые программы: установщик, переносная версия, бинарники Linux и macOS, <code>.pyz</code>; маяк для роутеров под 6 архитектур с <code>install.sh</code> и пакетом OpenWrt; документация.</li>
             <li><b>0.2</b> — панель узла и окно расширения, фильтр приватных страниц, режим <code>--debug</code> с окном логов, страницы «у соседа» в панели, маяк <code>dnetd</code> для роутеров с логом, автозапуск (systemd и скрипты для роутеров), <code>run.bat</code> и демонстрация на одном компьютере.</li>
@@ -106,9 +108,9 @@
         <h3>Скачать</h3>
         <div class="in">
           <div class="btns" style="flex-direction:column">
-            <a class="btn" href="downloads/DNet-0.4-Setup.exe">Установщик Windows<br><small>36.9 МБ · без прав админа</small></a>
-            <a class="btn" href="downloads/DNet-0.4-portable.zip">Переносная версия<br><small>25.9 МБ · zip</small></a>
-            <a class="btn" href="downloads/dnet-0.4-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="downloads/DNet-0.5-Setup.exe">Установщик Windows<br><small>36.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.5-portable.zip">Переносная версия<br><small>25.9 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.5-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
             <a class="btn" href="download.html">Все файлы и SHA-256</a>
           </div>
         </div>
@@ -159,7 +161,7 @@
   </div>
 
   <div id="foot">
-    DNet 0.4 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    DNet 0.5 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
     Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
   </div>
 </div>

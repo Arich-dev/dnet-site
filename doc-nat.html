@@ -18,7 +18,7 @@
       <h1>DNet</h1>
       <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
     </div>
-    <div class="ver">версия <b>0.4</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+    <div class="ver">версия <b>0.5</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
   </div>
 
   <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
@@ -72,10 +72,13 @@
         </div>
       </div>
       <div class="box">
-        <h2>Как проверить</h2>
+        <h2>Как это проверено</h2>
         <div class="in">
-<p>Три узла на одном компьютере: публичный (с <code>relay.serve = true</code>), два «за NAT» (<code>DNET_FORCE_NAT=1</code> отбрасывает входящие соединения) и <code>DNET_NO_UPNP=1</code> (чтобы тест не трогал ваш роутер). Через 20–40 секунд один узел получает страницу второго через ретранслятор, а потом канал становится «прямым».</p>
-<p>На реальных NAT (в том числе симметричных) пробивка пока не проверялась.</p>
+<p>На лаборатории из пяти виртуальных машин OpenWrt (VirtualBox, схема и скрипты — <code>tools/lab/</code>): публичный узел с реестром, два роутера с настоящим NAT (Linux conntrack, один с <code>miniupnpd</code>; внешняя сеть лаборатории — публичный диапазон, потому что <code>miniupnpd</code> отказывается работать с частным внешним адресом, как и настоящие роутеры) и два узла за ними.</p>
+<table><tr><th>Сценарий</th><th>Результат</th></tr><tr><td>Определение «за NAT» (обратное подключение публичного соседа)</td><td>работает: узлы пишут «вы за NAT, порт закрыт»</td></tr><tr><td>Вход через реестр, без адресов вручную</td><td>работает: узлы нашли публичный узел только по реестру</td></tr><tr><td>Ретрансляция: страница с узла A за NAT на узел B за другим NAT</td><td>работает</td></tr><tr><td>Пробивка NAT между двумя обычными (портосохраняющими) NAT</td><td>работает: прямое соединение между узлами с первой попытки</td></tr><tr><td>Симметричный NAT (случайный внешний порт) на одном из роутеров</td><td>пробивка не удаётся, узлы остаются на ретрансляторе, страницы ходят</td></tr><tr><td>UPnP: <code>miniupnpd</code> на роутере</td><td>узел получает проброс 48556 и внешний адрес, публичный узел подключается к нему обратно («открыт через UPnP»), и узел сам становится ретранслятором</td></tr></table>
+<p>Лаборатория помогла найти и исправить ошибки (бесконечная повторная трассировка при пустом результате, потеря отметки «прямое» при обновлении списка соседей, диагностика SOAP-ошибок UPnP).</p>
+<p>Не проверено: настоящие домашние роутеры и провайдеры (в том числе CGNAT), IPv6, нестандартные NAT (например, с разными таймаутами) и потеря канала при смене сети.</p>
+<p>Для быстрой проверки без виртуальных машин: три узла на одном компьютере, публичный (<code>relay.serve = true</code>), два «за NAT» (<code>DNET_FORCE_NAT=1</code> отбрасывает входящие) и <code>DNET_NO_UPNP=1</code>, чтобы тест не трогал ваш роутер.</p>
         </div>
       </div>
 
@@ -85,9 +88,9 @@
         <h3>Скачать</h3>
         <div class="in">
           <div class="btns" style="flex-direction:column">
-            <a class="btn" href="downloads/DNet-0.4-Setup.exe">Установщик Windows<br><small>36.9 МБ · без прав админа</small></a>
-            <a class="btn" href="downloads/DNet-0.4-portable.zip">Переносная версия<br><small>25.9 МБ · zip</small></a>
-            <a class="btn" href="downloads/dnet-0.4-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="downloads/DNet-0.5-Setup.exe">Установщик Windows<br><small>36.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.5-portable.zip">Переносная версия<br><small>25.9 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.5-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
             <a class="btn" href="download.html">Все файлы и SHA-256</a>
           </div>
         </div>
@@ -138,7 +141,7 @@
   </div>
 
   <div id="foot">
-    DNet 0.4 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    DNet 0.5 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
     Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
   </div>
 </div>
