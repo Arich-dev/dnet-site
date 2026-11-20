@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сеть через интернет — DNet</title>
+<meta name="description" content="Реестр супернод и рост сети через интернет: как узел находит самую крупную суперноду.">
+<meta name="theme-color" content="#a9a9a9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="page">
+
+  <div id="top">
+    <a id="logo" href="index.html" title="На главную">DN</a>
+    <div>
+      <h1>DNet</h1>
+      <div class="tag">Самосканирующаяся P2P-сеть: компьютеры, платы и роутеры находят друг друга сами<br>и отдают сохранённые страницы, когда интернет сломан</div>
+    </div>
+    <div class="ver">версия <b>0.4</b><br>Python 3.8+ &middot; Chrome / Firefox &middot; C<br>Windows / Linux / macOS / роутеры</div>
+  </div>
+
+  <div id="nav"><a href="index.html">Главная</a><a href="how.html">Как работает</a><a href="nodes.html">Узлы</a><a href="protocol.html">Протокол</a><a href="install.html">Установка</a><a href="docs.html" class=on>Документация</a><a href="privacy.html">Безопасность</a><a href="status.html">Проверено</a><a href="faq.html">FAQ</a><a href="download.html">Скачать</a></div>
+
+  <div id="cols">
+    <div id="main">
+      <div class="box">
+        <h2>Сеть через интернет</h2>
+        <div class="in">
+<p>Локальная сеть находит соседей сама. Чтобы узлы из разных городов нашли друг друга, нужна хотя бы одна точка входа. Её роль играет <b>реестр супернод</b>: маленький сервер, который знает только супернод и растит сеть, как корни дерева.</p>
+<pre data-copy>   реестр  ──(список супернод, самая крупная первой)──▶  новый узел
+                                                            │ подключается к самой крупной
+                                                            ▼
+                          суперноды ◀──────────────── супернода
+                          рядом с ней  ───(op "near")──▶  отдаёт ближних супернод и обычных узлов</pre>
+<ol><li><b>Супернода</b> — узел с режимом «супер-узел», белым адресом (или пробросом) и включённым ретранслятором. Раз в 5 минут она объявляется реестру: <code>POST /announce</code> с числом соседей, страниц и ретранслируемых клиентов. Реестр проверяет обратным подключением, что по этому адресу правда отвечает DNet с таким <code>id</code>.</li><li><b>Реестр</b> хранит записи 15 минут после последнего объявления и ранжирует суперноды по «размеру» (соседи, ретранслируемые клиенты, страницы, аптайм).</li><li><b>Новый узел</b> (пока интернет есть и соседей из интернета меньше <code>target</code>) спрашивает реестр <code>GET /supers</code>, подключается к самой крупной суперноде (иногда ко второй, чтобы не грузить только одну) и спрашивает у неё <code>near</code>: список других супернод и обычных узлов рядом. Дальше реестр не нужен: найденные соседи рассказывают друг другу о своих по обычному протоколу.</li><li>Узлы за NAT подключаются к суперноде как к ретранслятору (<a href="doc-nat.html">NAT.md</a>).</li></ol>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Запуск своего реестра</h2>
+        <div class="in">
+<pre data-copy>python3 server/dnet_registry.py --port 48560 --data /var/lib/dnet-registry</pre>
+<p>Только стандартная библиотека. Служба systemd: <code>deploy/registry/dnet-registry.service</code>. Откройте TCP 48560. Закреплённые записи (всегда в списке, даже без объявлений) — файл <code>seed.json</code> в папке данных: <code>[{"ip":"203.0.113.5","port":48556,"id":"…","nick":"main"}]</code>. Чтобы сам сервер был суперзвеном сети, запустите на нём и обычный узел с <code>super.enabled</code>, <code>relay.serve=true</code> и положите его в <code>seed.json</code>.</p>
+<p>Ограничения реестра: до 5000 записей, не больше 3 на один IP, 20 запросов в минуту с адреса, только публичные IPv4, тело объявления до 4 КБ. Размер суперноды — самооценка узла (с потолком), поэтому её можно накрутить, но ничего, кроме позиции в списке, это не даёт: страницы и соседей узлы проверяют сами.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Настройка узла</h2>
+        <div class="in">
+<p>В окне («Настройки → Интернет») или в <code>config.json</code>:</p>
+<pre data-copy>"registry": {"urls": ["http://203.0.113.10:48560"], "announce": "auto", "target": 3}</pre>
+<p><code>announce</code>: <code>"auto"</code> — объявляться, если вы супер-узел и до вас можно достучаться; <code>true</code> / <code>false</code> — принудительно. Пустой список <code>urls</code> — работа без интернета-слоя. Тот же реестр отдаёт <code>/peers.json</code>, который можно прописать в <code>bootstrap.urls</code>.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Что не решено</h2>
+        <div class="in">
+<ul><li>Реестр один: упадёт — новые узлы не смогут войти (уже подключённые продолжат работать). Можно указать до трёх адресов в <code>urls</code>.</li><li>Нет шифрования и подписей: ради этого пока доверяйте только суперузлам, которым верите (вы можете закрепить их в <code>static_peers</code>).</li><li>Размер суперноды не проверяется независимо.</li></ul>
+        </div>
+      </div>
+
+    </div>
+    <div id="side">
+      <div class="box">
+        <h3>Скачать</h3>
+        <div class="in">
+          <div class="btns" style="flex-direction:column">
+            <a class="btn" href="downloads/DNet-0.4-Setup.exe">Установщик Windows<br><small>36.9 МБ · без прав админа</small></a>
+            <a class="btn" href="downloads/DNet-0.4-portable.zip">Переносная версия<br><small>25.9 МБ · zip</small></a>
+            <a class="btn" href="downloads/dnet-0.4-router.zip">Маяк для роутеров<br><small>171 КБ · 6 архитектур</small></a>
+            <a class="btn" href="download.html">Все файлы и SHA-256</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Быстрые факты</h3>
+        <div class="in">
+          <table>
+            <tr><td>Узел</td><td>Python 3.8+, без зависимостей</td></tr>
+            <tr><td>Расширение</td><td>Chrome и Firefox</td></tr>
+            <tr><td>Маяк</td><td>C, 40–85 КБ (статический)</td></tr>
+            <tr><td>Хранилище</td><td>SQLite + zlib</td></tr>
+            <tr><td>Срок хранения</td><td>14 дней</td></tr>
+            <tr><td>Кэш</td><td>200 МБ (супер: 2 ГБ)</td></tr>
+            <tr><td>Опрос соседей</td><td>каждые 20 с</td></tr>
+            <tr><td>UDP-маяк</td><td>каждые 15 с</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Порты</h3>
+        <div class="in">
+          <ul>
+            <li><code>UDP 48555</code> — маяк</li>
+            <li><code>TCP 48556</code> — обмен узлов</li>
+            <li><code>TCP 8765</code> — панель и API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Разделы</h3>
+        <div class="in">
+          <ul>
+            <li><a href="how.html">Как это работает</a></li>
+            <li><a href="protocol.html">Протокол и API</a></li>
+            <li><a href="install.html">Установка и настройка</a></li>
+            <li><a href="docs.html">Документация</a></li>
+            <li><a href="status.html">Что проверено на железе</a></li>
+            <li><a href="faq.html">Если не работает</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="foot">
+    DNet 0.4 &middot; учебный проект &middot; сборка сайта от 20.11.2026<br>
+    Страницы между узлами не подписываются и не шифруются — для домашней сети, а не для важных данных (<a href="privacy.html">подробнее</a>)
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
